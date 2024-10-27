@@ -4,6 +4,8 @@
 #include <future>
 #include <thread>
 
+//#include <chrono>
+
 namespace
 {
   arr getSub(const arr& zz, const intA& var) // extract sub-variable global zz
@@ -108,7 +110,7 @@ DecOptConstrained<T, U>::DecOptConstrained(arr& _z, std::vector<std::shared_ptr<
   , config(_config)
 {
   // maybe preferable to have the same pace for ADMM and AULA terms -> breaks convergence is set to 2.0, strange!
-  if(config.opt.aulaMuInc != 1.0) config.opt.aulaMuInc = std::min(1.2, config.opt.aulaMuInc);
+  if(config.opt.aulaMuInc != 1.0) config.opt.aulaMuInc = std::min(1.2, config.opt.aulaMuInc); // applies only to subroblems and not to addm consensus constraint
 
   /// TO BE EQUIVALENT TO PYTHON
   //opt.damping = 0.1;
@@ -363,7 +365,21 @@ bool DecOptConstrained<T, U>::stepParallel()
     DL.z = z;
     futures.push_back(std::async((i > 0 ? std::launch::async : std::launch::deferred),
     [&, i]{
-      return step(DL, newton, dual, i);
+
+//      using std::chrono::high_resolution_clock;
+//      using std::chrono::duration_cast;
+//      using std::chrono::duration;
+//      using std::chrono::milliseconds;
+//      auto start = high_resolution_clock::now();
+
+      const auto res = step(DL, newton, dual, i);
+
+//      auto end = high_resolution_clock::now();
+//      auto ms_int = duration_cast<milliseconds>(end - start);
+//      duration<double, std::milli> ms_double = end - start;
+//      std::cout << i << " step: stopping crit=" << res << " time=" << ms_double.count() << " ms\n";
+
+      return res;
     }
     ));
   }
@@ -409,7 +425,7 @@ bool DecOptConstrained<T, U>::step(DecLagrangianType& DL, OptNewton& newton, arr
   } else {
     double stopTol = newton.o.stopTolerance;
     if(config.opt.constrainedMethod==anyTimeAula)  newton.run(20);
-    else                                    newton.run();
+    else newton.run();
     newton.o.stopTolerance = stopTol;
   }
 
@@ -526,6 +542,7 @@ bool DecOptConstrained<T, U>::stoppingCriterion() const
   }
 
   // nominal exit condition
+  // std::cout << subProblemsSolved << " " << primalFeasibility(r) << " " << dualFeasibility(s) << std::endl;
   if(subProblemsSolved && primalFeasibility(r) && dualFeasibility(s))
   {
     if(opt.verbose>0) cout <<"** ADMM StoppingCriterion Primal Dual convergence" << std::endl;
@@ -538,6 +555,11 @@ bool DecOptConstrained<T, U>::stoppingCriterion() const
     if(opt.stopGTolerance<0. || r < opt.stopGTolerance)
       return true;
   }
+
+//  if(its >= 10) // was used to test locally the benefits of using a comparable number of iterations between ADMM and joint
+//  {
+//    return true;
+//  }
 
   return false;
 }
@@ -561,7 +583,7 @@ double DecOptConstrained<T, U>::primalResidual() const
 template <typename T, typename U>
 double DecOptConstrained<T, U>::dualResidual() const
 {
-  return DLs.front()->mu * length(z - z_prev);
+  return length(z - z_prev); // Note: This was before multiplied by /*DLs.front()->mu*/ but not sure why? the residual should be independent of the algorithm itself?
 }
 
 template <typename T, typename U>
