@@ -556,7 +556,7 @@ bool DecOptConstrained<T, U>::stoppingCriterion() const
       return true;
   }
 
-//  if(its >= 10) // was used to test locally the benefits of using a comparable number of iterations between ADMM and joint
+//  if(its >= 5) // was used to test locally the benefits of using a comparable number of iterations between ADMM and joint
 //  {
 //    return true;
 //  }

@@ -152,8 +152,8 @@ int main(int argc,char **argv)
 
   rnd.clockSeed();
 
-  //plan_3_blocks();
-  plan_4_blocks();
+  plan_3_blocks();
+  //plan_4_blocks();
 
   return 0;
 }

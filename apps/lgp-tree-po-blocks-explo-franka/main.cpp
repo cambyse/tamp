@@ -91,7 +91,7 @@ void plan_1_block()
   matp::MCTSPlanner tp;
   mp::KOMOPlanner mp;
 
-  tp.setR0( -0.5, 15.0 );
+  tp.setR0( -5.0, 1.50 ); // former setup working well: -0.5, 15.0
   tp.setNIterMinMax( 50000, 1000000 );
   tp.setRollOutMaxSteps( 50 );
   tp.setNumberRollOutPerSimulation( 1 );
@@ -177,8 +177,8 @@ void planMCTS()
   tp.setNumberRollOutPerSimulation( 1 );
   tp.setVerbose( false );
 
-//  tp.setFol( "LGP-1-block-6-sides-fol.g" );
-  tp.setFol( "LGP-2-blocks-6-sides-fol.g" );
+  tp.setFol( "LGP-1-block-6-sides-fol.g" );
+  //tp.setFol( "LGP-2-blocks-6-sides-fol.g" );
 
   // SOLVE
   auto start = std::chrono::high_resolution_clock::now();
@@ -187,7 +187,7 @@ void planMCTS()
 
   const auto elapsed = std::chrono::high_resolution_clock::now() - start;
   std::cout << "planning time (ms): " << std::chrono::duration_cast< std::chrono::milliseconds >(elapsed).count() << std::endl;
-  //tp.saveMCTSGraphToFile( "decision_graph.gv" );
+  tp.saveMCTSGraphToFile( "decision_graph.gv" );
   //generatePngImage( "decision_graph.gv" );
 
   // BUILD POLICY
@@ -211,7 +211,7 @@ int main(int argc,char **argv)
 
   //plan();
 
-  planMCTS();
+  //planMCTS();
 
   return 0;
 }

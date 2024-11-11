@@ -26,6 +26,30 @@ struct Parabol : public ConstrainedProblem
   }
 };
 
+struct Parabol2 : public ConstrainedProblem
+{
+  // min (x-10)^2
+  // s.t. x <= 0
+  void phi(arr& phi, arr& J, arr& H, ObjectiveTypeA& ot, const arr& x, arr& lambda)
+  {
+    if(!phi.p)
+    {
+      phi = arr(2);
+      J = arr(2, 1);
+      ot = ObjectiveTypeA(2);
+
+      ot(0) = OT_sos;
+      ot(1) = OT_ineq;
+    }
+
+    phi(0) = x(0) - 10.0;
+    J(0, 0) = 1.0;
+
+    // attemps to cause a lamda reset: idea: have a function only very slowly positive, and very strongly negative -> not successful so far
+//    phi(1) = pow(x(0), 1.0/10.0);
+//    J(1, 0) = 1.0 / 10.0 * pow(x(0), 1.0/10.0 - 1.0);
+  }
+};
 
 struct Distance2D : public ConstrainedProblem
 {
@@ -238,7 +262,7 @@ struct Valley2D : public ConstrainedProblem
 
 struct Valley2DSideWays : public ConstrainedProblem
 {
-  // min (y - slpha * x)^2
+  // min (y - alpha * x)^2
   // x = x_start
   // s.t  y < -1 - alpha * x
   Valley2DSideWays()

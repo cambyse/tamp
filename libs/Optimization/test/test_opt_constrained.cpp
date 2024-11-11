@@ -167,6 +167,24 @@ TEST(OptConstrained, Valley2DSideWaysWarmStart) {
   EXPECT_TRUE(its1 > its2);
 }
 
+// Attempt to cause a reset of the lagrange multipliers -> Not successful so far
+//TEST(OptConstrained, SimpleParabol2TestG) {
+//  arr x{1.0};
+//  arr dual; //dual
+
+//  Parabol2 pb;
+
+//  int verbose = 1;
+
+//  OptOptions options{NOOPT};
+//  options.aulaMuInc = 1.0;
+
+//  OptConstrained opt(x, dual, pb, verbose, options);
+//  opt.run();
+
+//  EXPECT_NEAR(0.0, x(0), eps_s);
+//}
+
 //
 int main(int argc, char **argv)
 {
