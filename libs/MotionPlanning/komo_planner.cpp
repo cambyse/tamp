@@ -516,7 +516,7 @@ void KOMOPlanner::optimizeMarkovianPath( Policy & policy )
 
 void KOMOPlanner::optimizeMarkovianPathFrom( const Policy::GraphNodeTypePtr & node )
 {
-  //std::cout << "optimizing markovian path for:" << node->id() << std::endl;
+  std::cout << "optimizing markovian path for:" << node->id() << std::endl;
 
   bool feasible = true;
 
@@ -557,7 +557,8 @@ void KOMOPlanner::optimizeMarkovianPathFrom( const Policy::GraphNodeTypePtr & no
       for(auto s = 0; s < komo->k_order; ++s)
       {
         const auto& kin = parent_path_piece( -int(komo->k_order) + s );
-        komo->configurations(s)->setJointState(kin.q);
+        //komo->configurations(s)->setJointState(kin.q);
+        komo->configurations(s)->copy(kin);
       }
     }
 

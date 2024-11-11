@@ -39,4 +39,7 @@ target_link_libraries(
  MultiAgentTaskPlanning
  MotionPlanning
  GeometricUtilityTasks
+ POMTP_controllers
+ MotionPlanning
+ GeometricUtilityTasks
  )

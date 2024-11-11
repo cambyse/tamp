@@ -13,10 +13,13 @@
 #include <Kin/kinViewer.h>
 
 #include <graph_planner.h>
+#include <mcts_planner.h>
+#include <mcts_planner_bs.h>
 
 #include <komo_planner.h>
 #include <approx_shape_to_sphere.h>
 #include <observation_tasks.h>
+#include <object_manipulation_tamp_controller.h>
 
 #include "komo_tree_groundings.h"
 
@@ -225,10 +228,10 @@ void display_robot()
   {
     rai::KinematicWorld kin;
 
-    kin.init( "LGP-franka-kin-one-table.g" );
-    kin.setJointState({0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
+    kin.init( "LGP-blocks-kin-2-blocks-one-table-for-display.g" ); // LGP-franka-kin-one-table.g
+    //kin.setJointState({0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
 
-    std::cout << "q:" << kin.q << std::endl;
+    //std::cout << "q:" << kin.q << std::endl;
 
 //    kin.init( "LGP-blocks-kin-unified-b6.g" );
 
@@ -248,6 +251,39 @@ void display_robot()
 
 //    rai::wait( 300, true );
   }
+}
+
+void decision_tree_2_blocks()
+{
+  matp::MCTSPlanner tp;
+  //matp::MCTSPlannerBs tp;
+
+  srand(2);
+
+  tp.setR0( -1.0, 1.0 );
+  tp.setNIterMinMax( 500, 100000 );
+  tp.setRollOutMaxSteps( 50 );
+  tp.setNumberRollOutPerSimulation( 1 );
+  tp.setVerbose( false );
+
+//  tp.setFol( "LGP-1-block-6-sides-fol.g" );
+  tp.setFol( "LGP-blocks-fol-2w-one-table_for_display.g" );
+
+  // SOLVE
+  auto start = std::chrono::high_resolution_clock::now();
+
+  tp.solve();
+
+  const auto elapsed = std::chrono::high_resolution_clock::now() - start;
+  std::cout << "planning time (ms): " << std::chrono::duration_cast< std::chrono::milliseconds >(elapsed).count() << std::endl;
+  tp.saveMCTSGraphToFile( "decision_tree.gv" );
+  generatePngImage( "decision_tree.gv" );
+
+
+  // BUILD POLICY
+  auto policy = tp.getPolicy();
+
+  savePolicyToFile( policy, "-candidate-2-blocks" );
 }
 
 void komo_tree_dev()
@@ -374,6 +410,80 @@ void plan_3_methods()
   }
 }
 
+void plan_Journal_2024()
+{
+  srand(1);
+
+  // build planner
+  matp::MCTSPlanner tp;
+  mp::KOMOPlanner mp;
+
+  tp.setR0( -1.0, 1.0 );
+  tp.setNIterMinMax( 500, 100000 );
+  tp.setRollOutMaxSteps( 50 );
+  tp.setNumberRollOutPerSimulation( 1 );
+  tp.setVerbose( false );
+
+  mp.setNSteps( 20 );
+  mp.setMinMarkovianCost( 0.00 );
+  mp.setMaxConstraint( 15.0 );
+  mp.addCostIrrelevantTask( "SensorDistanceToObject" );
+
+  // set start configurations
+  // D
+  //tp.setFol( "LGP-blocks-fol-one-table-no-precondition.g" );
+  //mp.setKin( "LGP-blocks-kin-one-table.g" );
+
+  // C
+  //tp.setFol( "LGP-blocks-fol-one-table.g" );
+  //mp.setKin( "LGP-blocks-kin-one-table.g" );
+
+  // checked, probably doesn't work with n steps = 5
+  // B
+  tp.setFol( "LGP-blocks-fol-2w-one-table.g" );
+  //tp.setFol( "LGP-blocks-fol-2w-one-table-no-precondition.g" );
+  mp.setKin( "LGP-blocks-kin-2w-one-table.g" );
+
+  // A
+  //tp.setFol( "LGP-blocks-fol-1w-one-table.g" );
+  //tp.setFol( "LGP-blocks-fol-1w-one-table-no-precondition.g" );
+  //mp.setKin( "LGP-blocks-kin-1w-one-table.g" );
+
+  // 4 blocks linear
+  //tp.setFol( "LGP-blocks-fol-4-blocks-1w-one-table.g" );
+  //mp.setKin( "LGP-blocks-kin-4-blocks-1w-one-table.g" );
+
+  // 4 blocks new version
+  //tp.setFol( "LGP-blocks-fol-4-blocks-24w-one-table.g" );
+  //mp.setKin( "LGP-blocks-kin-4-blocks-24w-one-table.g" );
+  //tp.setFol( "LGP-blocks-fol-1w-unified-4-blocks-new.g" );
+  //tp.setFol( "LGP-blocks-fol-2w-model-2-unified.g" );
+  //mp.setKin( "LGP-blocks-kin-1w-unified-4-blocks-new.g" );
+
+  // 5 blocks linear
+  //tp.setFol( "LGP-blocks-fol-5-blocks-1w-one-table.g" );
+  //mp.setKin( "LGP-blocks-kin-5-blocks-1w-one-table.g" );
+
+  // 6 blocks linear
+  //tp.setFol( "LGP-blocks-fol-6-blocks-1w-one-table.g" );
+  //mp.setKin( "LGP-blocks-kin-6-blocks-1w-one-table.g" );
+
+  // register symbols
+  mp.registerInit( groundTreeInit );
+  mp.registerTask( "pick-up"      , groundTreePickUp );
+  mp.registerTask( "put-down"     , groundTreePutDown );
+  mp.registerTask( "check"        , groundTreeCheck );
+  mp.registerTask( "stack"        , groundTreeStack );
+  mp.registerTask( "unstack"      , groundTreeUnStack );
+
+  // build and run tamp controller
+  ObjectManipulationTAMPController tamp(tp, mp);
+  TAMPlanningConfiguration config;
+  config.watchMarkovianOptimizationResults = false;
+  config.watchJointOptimizationResults = false;
+  tamp.plan(config);
+}
+
 
 //===========================================================================
 
@@ -387,9 +497,13 @@ int main(int argc,char **argv)
 
   //plan_graph_search();
 
-  plan_3_methods();
+  //plan_3_methods();
 
+  /// methods for creating materail for the thesis
   //display_robot();
+  //decision_tree_2_blocks();
+
+  plan_Journal_2024();
 
   return 0;
 }
