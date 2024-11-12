@@ -103,7 +103,7 @@ void KOMOSparsePlanner::groundPolicyActionsJoint( const TreeBuilder & tree,
 
         // square acc + fix switched objects
         W(komo.get()).addObjective(interval, tree, new TM_Transition(komo->world), OT_sos, NoArr, 1.0, 2);
-        W(komo.get()).addObjective(interval, tree, new TM_FixSwichedObjects(), OT_eq, NoArr, TM_FixSwichedObjects_scale, 2);
+        W(komo.get()).addObjective(interval, tree, new TM_FixSwichedObjects(), OT_eq, NoArr, TM_FixSwichedObjects_scale, 2); // This forces a zero velocity at the time where the kinematic switch happens
 
         // ground other tasks
         komo->groundTasks(interval, tree, q->data().leadingKomoArgs, 1);
@@ -589,8 +589,8 @@ void ADMMCompressedPlanner::optimize( Policy & policy, const rai::Array< std::sh
   // 2.2 - create sub-opt-problems
   std::vector<std::shared_ptr<GraphProblem>> converters;
   std::vector<std::shared_ptr<ConstrainedProblem>> constrained_problems;
-  converters.reserve(policy.leaves().size());
-  constrained_problems.reserve(policy.leaves().size());
+  converters.reserve(komos.size());
+  constrained_problems.reserve(komos.size());
   for(auto w = 0; w < komos.size(); ++w)
   {
     auto& komo = *komos[w];
@@ -617,6 +617,8 @@ void ADMMCompressedPlanner::optimize( Policy & policy, const rai::Array< std::sh
   decOptConfig.scheduling = PARALLEL;
   decOptConfig.compressed = true;
   decOptConfig.checkGradients = false;
+//  decOptConfig.muInit = 1.0;
+//  decOptConfig.muInc = 1.2;
 
   DecOptConstrained<T, U> opt(x, constrained_problems, xmasks, U(), decOptConfig);
   opt.run();
