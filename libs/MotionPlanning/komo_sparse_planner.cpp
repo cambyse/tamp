@@ -647,9 +647,11 @@ void ADMMCompressedPlanner::optimize( Policy & policy, const rai::Array< std::sh
   witness->set_x(x);
   witness->x = x;
 
+  XVariable Y{X_};
+  Y.x = x;
   EvaluationPlanner(config_,
                     komoFactory_,
-                    X_,
+                    Y,
                     "results/optimizationReportAdmmCompressed.re").optimize(policy, startKinematics, watchResult);
   //const auto report = getOptimizationReport(witness, std::get<0>(allVars));
   //report.save("optimizationReportAdmmCompressed.re");
