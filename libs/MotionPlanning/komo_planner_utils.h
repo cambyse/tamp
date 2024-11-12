@@ -2,6 +2,8 @@
 
 #include <skeleton.h>
 #include <boost/filesystem.hpp>
+#include <unordered_map>
+#include <unordered_set>
 
 namespace mp
 {
@@ -123,6 +125,57 @@ inline bool isTaskConstraintIrrelevant(const rai::String& task_name, const rai::
   }
 
   return isTaskIrrelevant(task_name, filtered_tasks);
+}
+
+inline std::unordered_map<uint, uint> GetNodeIdToDecisionGraphIds( const Policy& policy )
+{
+  // build a map policy id -> decision graph id
+  std::unordered_map<uint, uint> nodeIdToDecisionGraphId;
+  std::list< Policy::GraphNodeTypePtr > fifo;
+  fifo.push_back( policy.root() );
+
+  while( ! fifo.empty() )
+  {
+    auto b = fifo.back();
+    fifo.pop_back();
+
+    const auto& a = b->parent();
+
+    nodeIdToDecisionGraphId[b->id()] = b->data().decisionGraphNodeId;
+
+    for(const auto&c : b->children())
+    {
+      fifo.push_back(c);
+    }
+  }
+
+  return nodeIdToDecisionGraphId;
+}
+
+inline void ForEachEdge(const Policy& policy, std::function<void(const Policy::GraphNodeTypePtr&, const Policy::GraphNodeTypePtr&, const _Branch&)> func)
+{
+  const auto tree = buildTree(policy);
+
+  std::unordered_set<uint> visited;
+  for(const auto& l: policy.sleaves())
+  {
+    auto q = l;
+    auto p = q->parent();
+
+    const auto branch= tree._get_branch(l->id());
+
+    while(p)
+    {
+      if(visited.find(q->id()) == visited.end())
+      {
+        func(p, q, branch);
+
+        visited.insert(q->id());
+      }
+      q = p;
+      p = q->parent();
+    }
+  }
 }
 
 }

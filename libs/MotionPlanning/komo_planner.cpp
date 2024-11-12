@@ -266,7 +266,7 @@ void KOMOPlanner::solveAndInform( const MotionPlanningParameters & po, Policy & 
   }
   else if( po.getParam( "type" ) == "ADMMCompressed" )
   {
-    ADMMCompressedPlanner planner(config_, komoFactory_, getMarkovianPathTree(policy));
+    ADMMCompressedPlanner planner(config_, komoFactory_, getMarkovianPathTreeVariableQDim(policy));
     planner.setDecompositionStrategy(po.getParam("decompositionStrategy"), po.getParam("nJobs"));
     planner.optimize(policy, startKinematics_, watch);
   }
@@ -277,7 +277,7 @@ void KOMOPlanner::solveAndInform( const MotionPlanningParameters & po, Policy & 
   }
   else if( po.getParam( "type" ) == "EvaluateMarkovianCosts" )
   {
-    EvaluationPlanner evaluation(config_, komoFactory_, getMarkovianPathTree(policy), "results/optimizationReportMarkovianPathTree.re");
+    EvaluationPlanner evaluation(config_, komoFactory_, getMarkovianPathTreeVariableQDim(policy), "results/optimizationReportMarkovianPathTree.re");
     evaluation.optimize(policy, startKinematics_, watch);
   }
   else
@@ -398,86 +398,155 @@ void KOMOPlanner::displayMarkovianPaths( const Policy & policy, double sec ) con
   }
 }
 
-arr KOMOPlanner::getMarkovianPathTree( const Policy & policy ) const
+//arr KOMOPlanner::getMarkovianPathTree( const Policy & policy ) const
+//{
+//  // This method assumes a constant qdim, which is not possible for more complex kinematic switches!
+//  arr x;
+
+//  const auto tree = buildTree(policy);
+
+//  // build a map policy id -> decision graph id
+//  std::unordered_map<uint, uint> nodeIdToDecisionGraphId = GetNodeIdToDecisionGraphIds(policy);
+
+//  // go through policy and gather planned configurations
+//  const auto q_dim = startKinematics_.front()->q.d0;
+//  x.resize((tree.n_nodes() - 1) * config_.microSteps_ * q_dim);
+//  std::unordered_set<uint> visited;
+
+//  for(const auto& l: policy.sleaves())
+//  {
+//    auto q = l;
+//    auto p = q->parent();
+
+//    const auto branch= tree._get_branch(l->id());
+
+//    while(p)
+//    {
+//      if(visited.find(q->id()) == visited.end())
+//      {
+//        double start = p->depth();
+//        double end = q->depth();
+
+//        const auto var_0 = tree.get_vars0(TimeInterval{start, end}, branch, config_.microSteps_);
+//        const auto decision_graph_id = nodeIdToDecisionGraphId.at(q->id());
+//        const auto& witness_path_piece = markovianPaths_.at(decision_graph_id);
+
+//        for(uint s=0; s < witness_path_piece.d0 - markovian_path_k_order_; ++s)
+//        {
+//          const auto global = var_0(s);
+//          const auto & kin = witness_path_piece(s + markovian_path_k_order_);
+
+//          for(uint i=0; i < q_dim; ++i)
+//          {
+//            const auto global_i = global * q_dim + i;
+//            CHECK(x(global_i) == 0.0, "overrides part of x already gathered, it is most likely a bug!");
+//            x(global_i) = kin.q(i);
+//          }
+//        }
+
+//        // double check connection integrity
+//        if(p->id() != 0)
+//        {
+//          const auto parent_decision_graph_id = nodeIdToDecisionGraphId.at(p->id());
+//          const auto& witness_parent_path_piece = markovianPaths_.at(parent_decision_graph_id);
+////          std::cout << "check transition " << p->data().decisionGraphNodeId << "->" << q->data().decisionGraphNodeId << " (" << p->id() << "->" << q->id() << ")" << std::endl;
+////          std::cout << witness_path_piece(0).q << " vs. " << witness_parent_path_piece(-2).q << std::endl;
+////          std::cout << witness_path_piece(1).q << " vs. " << witness_parent_path_piece(-1).q << std::endl;
+
+//          CHECK(witness_parent_path_piece(-2).q == witness_path_piece(0).q, "wrong order 2 connection!");
+//        }
+//        //
+
+//        visited.insert(q->id());
+//      }
+//      q = p;
+//      p = q->parent();
+//    }
+//  }
+
+//  return x;
+//}
+
+arr KOMOPlanner::getMarkovianPathTreeVariableQDim( const Policy & policy ) const
 {
-  arr x;
+  // build a map policy id -> decision graph id
+  std::unordered_map<uint, uint> nodeIdToDecisionGraphId = GetNodeIdToDecisionGraphIds(policy);
 
   const auto tree = buildTree(policy);
 
-  // build a map policy id -> decision graph id
-  std::unordered_map<uint, uint> nodeIdToDecisionGraphId;
-  std::list< Policy::GraphNodeTypePtr > fifo;
-  fifo.push_back( policy.root() );
+  // go through policy and gather xdims
+  intA stepToQDim;
+  stepToQDim.resize((tree.n_nodes() - 1) * config_.microSteps_);
 
-  while( ! fifo.empty() )
+  ForEachEdge(policy, [&](const auto&p, const auto& q, const auto& branch)
   {
-    auto b = fifo.back();
-    fifo.pop_back();
+    const double start = p->depth();
+    const double end = q->depth();
 
-    const auto& a = b->parent();
+    const auto var_0 = tree.get_vars0(TimeInterval{start, end}, branch, config_.microSteps_);
+    const auto decision_graph_id = nodeIdToDecisionGraphId.at(q->id());
+    const auto& witness_path_piece = markovianPaths_.at(decision_graph_id);
 
-    nodeIdToDecisionGraphId[b->id()] = b->data().decisionGraphNodeId;
-
-    for(const auto&c : b->children())
+    for(uint s=0; s < witness_path_piece.d0 - markovian_path_k_order_; ++s)
     {
-      fifo.push_back(c);
+      const auto global = var_0(s);
+      const auto & kin = witness_path_piece(s + markovian_path_k_order_);
+
+      CHECK(stepToQDim(global) == 0, "the mapping step to qdim should not be written twice, it is most likely a bug!");
+      stepToQDim(global) = kin.q.d0;
     }
+  });
+
+  // compute cumulated x dimension
+  intA stepTointegratedQDim; stepTointegratedQDim.resize(stepToQDim.d0); // mapping from step to the cumulated qdim up to there in the optimization variable
+  uint integratedQDim{0};
+  for(uint s{0}; s < stepToQDim.d0; ++s)
+  {
+    integratedQDim += stepToQDim(s);
+    stepTointegratedQDim(s) = integratedQDim;
   }
 
   // go through policy and gather planned configurations
-  const auto q_dim = startKinematics_.front()->q.d0;
-  x.resize((tree.n_nodes() - 1) * config_.microSteps_ * q_dim);
-  std::unordered_set<uint> visited;
+  arr x; x.resize(integratedQDim);
 
-  for(const auto& l: policy.sleaves())
+  ForEachEdge(policy, [&](const auto&p, const auto& q, const auto& branch)
   {
-    auto q = l;
-    auto p = q->parent();
+    const double start = p->depth();
+    const double end = q->depth();
 
-    const auto branch= tree._get_branch(l->id());
+    const auto var_0 = tree.get_vars0(TimeInterval{start, end}, branch, config_.microSteps_);
+    const auto decision_graph_id = nodeIdToDecisionGraphId.at(q->id());
+    const auto& witness_path_piece = markovianPaths_.at(decision_graph_id);
 
-    while(p)
+    for(uint s=0; s < witness_path_piece.d0 - markovian_path_k_order_; ++s)
     {
-      if(visited.find(q->id()) == visited.end())
+      const auto global = var_0(s);
+      const auto & kin = witness_path_piece(s + markovian_path_k_order_);
+      const auto qdim = stepToQDim(global);
+      const auto global_i_start = stepTointegratedQDim(global) - qdim;
+
+      CHECK(kin.q.d0 == qdim, "inconsistent dimensions");
+
+      for(uint i=0; i < qdim; ++i)
       {
-        double start = p->depth();
-        double end = q->depth();
+        const auto global_i = global_i_start + i;
+        CHECK(x(global_i) == 0.0, "overrides part of x already gathered, it is most likely a bug!");
+        x(global_i) = kin.q(i);
+      }
+    }
 
-        const auto var_0 = tree.get_vars0(TimeInterval{start, end}, branch, config_.microSteps_);
-        const auto decision_graph_id = nodeIdToDecisionGraphId.at(q->id());
-        const auto& witness_path_piece = markovianPaths_.at(decision_graph_id);
-
-        for(uint s=0; s < witness_path_piece.d0 - markovian_path_k_order_; ++s)
-        {
-          const auto global = var_0(s);
-
-          for(uint i=0; i < q_dim; ++i)
-          {
-            const auto global_i = global * q_dim + i;
-            CHECK(x(global_i) == 0.0, "overrides part of x already gathered, it is most likely a bug!");
-            x(global_i) = witness_path_piece(s + markovian_path_k_order_).q(i);
-          }
-        }
-
-        // double check connection integrity
-        if(p->id() != 0)
-        {
-          const auto parent_decision_graph_id = nodeIdToDecisionGraphId.at(p->id());
-          const auto& witness_parent_path_piece = markovianPaths_.at(parent_decision_graph_id);
+    // double check connection integrity
+    if(p->id() != 0)
+    {
+      const auto parent_decision_graph_id = nodeIdToDecisionGraphId.at(p->id());
+      const auto& witness_parent_path_piece = markovianPaths_.at(parent_decision_graph_id);
 //          std::cout << "check transition " << p->data().decisionGraphNodeId << "->" << q->data().decisionGraphNodeId << " (" << p->id() << "->" << q->id() << ")" << std::endl;
 //          std::cout << witness_path_piece(0).q << " vs. " << witness_parent_path_piece(-2).q << std::endl;
 //          std::cout << witness_path_piece(1).q << " vs. " << witness_parent_path_piece(-1).q << std::endl;
 
-          CHECK(witness_parent_path_piece(-2).q == witness_path_piece(0).q, "wrong order 2 connection!");
-        }
-        //
-
-        visited.insert(q->id());
-      }
-      q = p;
-      p = q->parent();
+      CHECK(witness_parent_path_piece(-2).q == witness_path_piece(0).q, "wrong order 2 connection!");
     }
-  }
+  });
 
   return x;
 }
@@ -567,10 +636,23 @@ void KOMOPlanner::optimizeMarkovianPathFrom( const Policy::GraphNodeTypePtr & no
     komo->setModel( kin, true/*, false, true, false, false*/ );
     komo->setTiming( 1.0, config_.microSteps_, config_.secPerPhase_, 2 );
     komo->setSquaredQAccelerations();
-    komo->setFixSwitchedObjects( -1., -1., 3e1 ); // exact meaning?
+    komo->setFixSwitchedObjects( -1., -1., 3e1 ); // This forces a zero velocity at the time where the kinematic switch happens
 
     komo->groundInit();
+
+    ///
+    if( node->id() == 20 )
+    {
+      int a{0};
+    }
     komo->groundTasks( 0, node->data().leadingKomoArgs );
+    for(auto parent = node->parent(); parent; parent=parent->parent())
+    {
+      std::cout << "parent:" << parent->id() << std::endl;
+      const double phase = static_cast<double>(parent->depth()) - static_cast<double>(node->depth());
+      //komo->groundTasks( phase, parent->data().leadingKomoArgs );
+    }
+    ///
 
     komo->reset();
 
@@ -597,8 +679,8 @@ void KOMOPlanner::optimizeMarkovianPathFrom( const Policy::GraphNodeTypePtr & no
       cout << "KOMO FAILED: " << msg <<endl;
     }
 
-//    if( node->id() == 109 )
-//    {
+    if( node->id() == 20 )
+    {
 ////      int a{0};
 ////          for(const auto& f: komo->world.frames)
 ////          {
@@ -609,17 +691,17 @@ void KOMOPlanner::optimizeMarkovianPathFrom( const Policy::GraphNodeTypePtr & no
 //      komo->configurations.front()->watch(true);
 //      komo->configurations.last()->watch(true);
 
-////      komo->displayTrajectory();
+//     komo->displayTrajectory();
 
 //      //komo->saveTrajectory( std::to_string( node->id() ) );
 //      //komo->plotVelocity( std::to_string( node->id() ) );
 //      //rai::wait();
-//    }
+    }
 
     const Graph result = komo->getReport();
 
     const double cost = GetCost(result, config_.taskIrrelevantForPolicyCost);
-    const double constraints = result.get<double>( { "total", "constraints" } );
+    const double constraints = GetConstraints(result, config_.taskIrrelevantForPolicyCost);//result.get<double>( { "total", "constraints" } );
 
     markovianPathCosts_      [ node->data().decisionGraphNodeId ] += /*node->data().beliefState[ w ] **/ cost;
     markovianPathConstraints_[ node->data().decisionGraphNodeId ] += /*node->data().beliefState[ w ] **/ constraints;
@@ -629,10 +711,10 @@ void KOMOPlanner::optimizeMarkovianPathFrom( const Policy::GraphNodeTypePtr & no
     {
       feasible = false;
 
-      //komo->getReport(true);
+      komo->getReport(true);
       //komo->configurations.first()->watch(true);
       //komo->configurations.last()->watch(true);
-      //komo->displayTrajectory();
+      komo->displayTrajectory();
     }
 
     // update effective kinematic

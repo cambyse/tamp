@@ -33,7 +33,8 @@ public:
   // display
   void display( const Policy & policy, double sec ) override;
   void displayMarkovianPaths( const Policy & policy, double sec ) const;
-  arr getMarkovianPathTree( const Policy & policy ) const;
+  //arr getMarkovianPathTree( const Policy & policy ) const; // retired, was not supporting variable qdim!
+  arr getMarkovianPathTreeVariableQDim( const Policy & policy ) const;
 
   // evaluation (paper with TMKit comparison)
   std::pair< double, double > evaluateLastSolution();
