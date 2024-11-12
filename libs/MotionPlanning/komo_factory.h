@@ -70,4 +70,19 @@ private:
   std::map< std::string, TreeSymbolGrounder > treeTasks_;
 };
 
+// Structure to exchange the variable X
+struct XVariable
+{
+  arr x;
+  intA stepToQDim; // global step to qdim
+  intA stepTointegratedQDim;
+
+  uint GetGlobalIndex(const uint global_step) const
+  {
+    CHECK(global_step < stepToQDim.d0, "corrupted dimensions");
+    CHECK(global_step < stepTointegratedQDim.d0, "corrupted dimensions");
+    return stepTointegratedQDim(global_step) - stepToQDim(global_step);
+  };
+};
+
 }

@@ -27,7 +27,7 @@ namespace mp
 {
 static constexpr double eps = std::numeric_limits< double >::epsilon();
 
-double GetCost(const Graph& result, const StringA& filtered_tasks)
+static double GetCost(const Graph& result, const StringA& filtered_tasks)
 {
   double cost{0.0};
 
@@ -51,7 +51,7 @@ double GetCost(const Graph& result, const StringA& filtered_tasks)
   return cost;
 }
 
-double GetConstraints(const Graph& result, const StringA& filtered_tasks)
+static double GetConstraints(const Graph& result, const StringA& filtered_tasks)
 {
   double constraint{0.0};
 
@@ -467,7 +467,7 @@ void KOMOPlanner::displayMarkovianPaths( const Policy & policy, double sec ) con
 //  return x;
 //}
 
-arr KOMOPlanner::getMarkovianPathTreeVariableQDim( const Policy & policy ) const
+XVariable KOMOPlanner::getMarkovianPathTreeVariableQDim( const Policy & policy ) const
 {
   // build a map policy id -> decision graph id
   std::unordered_map<uint, uint> nodeIdToDecisionGraphId = GetNodeIdToDecisionGraphIds(policy);
@@ -507,7 +507,10 @@ arr KOMOPlanner::getMarkovianPathTreeVariableQDim( const Policy & policy ) const
   }
 
   // go through policy and gather planned configurations
-  arr x; x.resize(integratedQDim);
+  XVariable X;
+  X.stepToQDim = stepToQDim;
+  X.stepTointegratedQDim = stepTointegratedQDim;
+  X.x.resize(integratedQDim);
 
   ForEachEdge(policy, [&](const auto&p, const auto& q, const auto& branch)
   {
@@ -530,8 +533,8 @@ arr KOMOPlanner::getMarkovianPathTreeVariableQDim( const Policy & policy ) const
       for(uint i=0; i < qdim; ++i)
       {
         const auto global_i = global_i_start + i;
-        CHECK(x(global_i) == 0.0, "overrides part of x already gathered, it is most likely a bug!");
-        x(global_i) = kin.q(i);
+        CHECK(X.x(global_i) == 0.0, "overrides part of x already gathered, it is most likely a bug!");
+        X.x(global_i) = kin.q(i);
       }
     }
 
@@ -548,7 +551,7 @@ arr KOMOPlanner::getMarkovianPathTreeVariableQDim( const Policy & policy ) const
     }
   });
 
-  return x;
+  return X;
 }
 
 std::pair< double, double > KOMOPlanner::evaluateLastSolution()
