@@ -119,7 +119,7 @@ void plan_1_block()
   ObjectManipulationTAMPController tamp(tp, mp);
   TAMPlanningConfiguration config;
   config.watchMarkovianOptimizationResults = false;
-  config.watchJointOptimizationResults = false;
+  config.watchJointOptimizationResults = true;
   tamp.plan(config);
 }
 
@@ -159,7 +159,7 @@ void plan_2_blocks()
   ObjectManipulationTAMPController tamp(tp, mp);
   TAMPlanningConfiguration config;
   config.watchMarkovianOptimizationResults = false;
-  config.watchJointOptimizationResults = false;
+  config.watchJointOptimizationResults = true;
   tamp.plan(config);
 }
 
