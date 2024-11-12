@@ -90,6 +90,11 @@ void plan_4_blocks()
   tp.setNumberRollOutPerSimulation( 1 );
   tp.setVerbose( false );
 
+  mp.setNSteps( 20 );
+  mp.setMinMarkovianCost( 0.00 );
+  mp.setMaxConstraint( 15.0 );
+  mp.addCostIrrelevantTask( "FixSwichedObjects" );
+
   // set problem
   tp.setFol( "LGP-4-blocks-1-side-fol.g" );
   mp.setKin( "LGP-4-blocks-1-side-kin.g" );
@@ -106,7 +111,7 @@ void plan_4_blocks()
   ObjectManipulationTAMPController tamp(tp, mp);
   TAMPlanningConfiguration config;
   config.watchMarkovianOptimizationResults = false;
-  config.watchJointOptimizationResults = false;
+  config.watchJointOptimizationResults = true;
   tamp.plan(config);
 }
 
@@ -124,6 +129,11 @@ void plan_3_blocks()
   tp.setNumberRollOutPerSimulation( 1 );
   tp.setVerbose( false );
 
+  mp.setNSteps( 20 );
+  mp.setMinMarkovianCost( 0.00 );
+  mp.setMaxConstraint( 15.0 );
+  mp.addCostIrrelevantTask( "FixSwichedObjects" );
+
   // set problem
   tp.setFol( "LGP-3-blocks-1-side-fol.g" );
   mp.setKin( "LGP-3-blocks-1-side-kin.g" );
@@ -140,7 +150,7 @@ void plan_3_blocks()
   ObjectManipulationTAMPController tamp( tp, mp );
   TAMPlanningConfiguration config;
   config.watchMarkovianOptimizationResults = false;
-  config.watchJointOptimizationResults = false;
+  config.watchJointOptimizationResults = true;
   tamp.plan( config );
 }
 
