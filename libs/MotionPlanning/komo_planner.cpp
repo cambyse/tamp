@@ -41,7 +41,7 @@ double GetCost(const Graph& result, const StringA& filtered_tasks)
     {
       const auto& type = attributes->get<rai::String>({ "type" });
 
-      if(attributes && !isTaskIrrelevant(task_name, type, filtered_tasks))
+      if(attributes && !isTaskCostIrrelevant(task_name, type, filtered_tasks))
       {
         cost += attributes->get<double>({ "sqrCosts" });
       }
@@ -49,6 +49,33 @@ double GetCost(const Graph& result, const StringA& filtered_tasks)
   }
 
   return cost;
+}
+
+double GetConstraints(const Graph& result, const StringA& filtered_tasks)
+{
+  double constraint{0.0};
+
+  for(const auto& node: result)
+  {
+    const auto& task_name = node->keys().front();
+
+    const auto& attributes = node->getValue<Graph>();
+
+    if(attributes) // no attributes indicate here that the node doesn't correspond to a task
+    {
+      const auto& type = attributes->get<rai::String>({ "type" });
+
+      if(attributes && !isTaskConstraintIrrelevant(task_name, type, filtered_tasks))
+      {
+        constraint += attributes->get<double>({ "constraints" });
+      }
+    }
+  }
+
+  //  std::cout << result << std::endl;
+  //  return result.get<double>( { "total", "constraints" } );
+
+  return constraint;
 }
 
 //--------Motion Planner--------------//
@@ -759,7 +786,7 @@ void KOMOPlanner::optimizePathTo( const PolicyNodePtr & leaf )
       komo->setModel( *startKinematics_( w ), true/*, false, true, false, false*/ );
       komo->setTiming( leafTime, config_.microSteps_, config_.secPerPhase_, 2 );
       komo->setSquaredQAccelerations();
-      komo->setFixSwitchedObjects( -1., -1., 3e1 ); // exact meaning?
+      komo->setFixSwitchedObjects( -1., -1., 3e1 ); // This forces a zero velocity at the time where the kinematic switch happens
 
       komo->groundInit();
 
@@ -878,7 +905,7 @@ void KOMOPlanner::optimizeJointPathTo( const PolicyNodePtr & leaf )
       komo->setModel( *startKinematics_( w ), true/*, false, true, false, false*/ );
       komo->setTiming( leafTime, config_.microSteps_, config_.secPerPhase_, 2 );
       komo->setSquaredQAccelerations();
-      komo->setFixSwitchedObjects( -1., -1., 3e1 ); // exact meaning?
+      komo->setFixSwitchedObjects( -1., -1., 3e1 ); // This forces a zero velocity at the time where the kinematic switch happens
 
       komo->groundInit();
 

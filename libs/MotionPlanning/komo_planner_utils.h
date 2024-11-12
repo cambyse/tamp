@@ -92,24 +92,6 @@ static void freeKomo( ExtensibleKOMO::ptr komo )
   listDelete( komo->switches );
 }
 
-inline bool isTaskIrrelevant(const rai::String& task_name, const rai::String& type, const StringA& filtered_tasks)
-{
-  if(type != "sos")
-  {
-    return true;
-  }
-
-  for(const auto& to_filter_out: filtered_tasks)
-  {
-    if(task_name.contains(to_filter_out))
-    {
-      return true;
-    }
-  }
-
-  return false;
-}
-
 inline bool isTaskIrrelevant(const rai::String& task_name, const StringA& filtered_tasks)
 {
   for(const auto& to_filter_out: filtered_tasks)
@@ -121,6 +103,26 @@ inline bool isTaskIrrelevant(const rai::String& task_name, const StringA& filter
   }
 
   return false;
+}
+
+inline bool isTaskCostIrrelevant(const rai::String& task_name, const rai::String& type, const StringA& filtered_tasks)
+{
+  if(type != "sos")
+  {
+    return true;
+  }
+
+  return isTaskIrrelevant(task_name, filtered_tasks);
+}
+
+inline bool isTaskConstraintIrrelevant(const rai::String& task_name, const rai::String& type, const StringA& filtered_tasks)
+{
+  if(type != "eq" || type != "ineq")
+  {
+    return true;
+  }
+
+  return isTaskIrrelevant(task_name, filtered_tasks);
 }
 
 }
