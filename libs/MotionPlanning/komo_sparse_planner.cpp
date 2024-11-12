@@ -157,7 +157,7 @@ void KOMOSparsePlanner::watch( const std::shared_ptr< ExtensibleKOMO > & komo, c
 void KOMOSparsePlanner::watch( const rai::Array< std::shared_ptr< const rai::KinematicWorld > > & startKinematics,
                                const rai::Array<rai::KinematicSwitch*> switches,
                                const Policy & policy, const TreeBuilder & tree,
-                               const arr& x,
+                               const XVariable& X,
                                const uint stepsPerPhase,
                                const uint k_order ) const
 {
@@ -181,7 +181,6 @@ void KOMOSparsePlanner::watch( const rai::Array< std::shared_ptr< const rai::Kin
     const auto leaf = get_leaf_for_world(w, policy_leaves);
     const auto branch = tree.get_branch(leaf);
     const auto vars0 = branch.get_vars0({0.0, branch.n_nodes() - 1}, tree._get_branch(leaf), stepsPerPhase);
-    const auto qDim = startKinematics(w)->q.d0;
 
     frames(0)(w).resize(vars0.d0 + k_order);
     frames(0)(w)(0).copy(*startKinematics(w), true);
@@ -195,13 +194,9 @@ void KOMOSparsePlanner::watch( const rai::Array< std::shared_ptr< const rai::Kin
     // copy frames and apply q
     for(auto s{0}; s < vars0.d0; ++s)
     {
+      auto& K = frames(0)(w)(s + k_order); // target frame
+      K.copy(frames(0)(w)(s + k_order - 1), true); // copy preceeding one
       const auto global = vars0(s);
-      const auto x_start{global * qDim};
-      const auto q = x({x_start, x_start + qDim - 1});
-
-      auto& K = frames(0)(w)(s + k_order);
-      K.copy(frames(0)(w)(s + k_order - 1), true);
-      K.setJointState(q);
 
       //apply potential graph switches
       for(auto *sw:switches)
@@ -211,6 +206,15 @@ void KOMOSparsePlanner::watch( const rai::Array< std::shared_ptr< const rai::Kin
           sw->apply(K);
         }
       }
+
+      const auto qDim = K.getJointStateDimension();
+      CHECK(qDim != 0, "dimension corruption!");
+      CHECK(qDim == X.stepToQDim(global), "dimension corruption!");
+
+      const auto x_start{X.GetGlobalIndex(global)};
+      const auto q = X.x({x_start, x_start + qDim - 1});
+
+      K.setJointState(q);
     }
   }
 
@@ -604,7 +608,7 @@ void ADMMCompressedPlanner::optimize( Policy & policy, const rai::Array< std::sh
   // 3 - RUN
   auto start = std::chrono::high_resolution_clock::now();
 
-  auto x = x_.d0 ? x_ : witness->x;
+  auto x = X_.x.d0 ? X_.x : witness->x;
 
   OptOptions options;
   options.verbose = 1;
@@ -645,7 +649,7 @@ void ADMMCompressedPlanner::optimize( Policy & policy, const rai::Array< std::sh
 
   EvaluationPlanner(config_,
                     komoFactory_,
-                    x,
+                    X_,
                     "results/optimizationReportAdmmCompressed.re").optimize(policy, startKinematics, watchResult);
   //const auto report = getOptimizationReport(witness, std::get<0>(allVars));
   //report.save("optimizationReportAdmmCompressed.re");
@@ -671,13 +675,13 @@ void EvaluationPlanner::optimize( Policy & policy, const rai::Array< std::shared
   W(komo.get()).reset(allVars);
 
   // initialize
-  CHECK(x_.d0 != 0, "invalid x")
+  CHECK(X_.x.d0 != 0, "invalid x")
 
-  komo->set_x( x_ );
+  komo->set_x( X_.x );
 
   const auto report = getOptimizationReport(komo, allVars);
   report.save( reportFile_ );
 
-  if(watchResult) watch( startKinematics, komo->switches, policy, tree, x_, komo->stepsPerPhase, komo->k_order );
+  if(watchResult) watch( startKinematics, komo->switches, policy, tree, X_, komo->stepsPerPhase, komo->k_order );
 }
 }

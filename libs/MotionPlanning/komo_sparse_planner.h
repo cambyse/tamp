@@ -36,7 +36,7 @@ public:
               const rai::Array<rai::KinematicSwitch*> switches,
               const Policy & policy,
               const TreeBuilder & tree,
-              const arr& x,
+              const XVariable& X,
               const uint stepsPerPhase,
               const uint k_order ) const;
 
@@ -75,9 +75,9 @@ public:
 class ADMMCompressedPlanner : KOMOSparsePlanner
 {
 public:
-  ADMMCompressedPlanner(const KOMOPlannerConfig& config, const KOMOFactory& factory, const arr& x)
+  ADMMCompressedPlanner(const KOMOPlannerConfig& config, const KOMOFactory& factory, const XVariable& X)
     : KOMOSparsePlanner(config, factory)
-    , x_{x}
+    , X_{X}
   {};
   void setDecompositionStrategy(const std::string& strategy, const std::string& nJobs);
   void groundPolicyActionsCompressed( const TreeBuilder & fullTree,
@@ -92,7 +92,7 @@ private:
   GeneratorFactory generatorFactory_;
   std::string decompositionStrategy_;
   uint nJobs_{8};
-  arr x_;
+  XVariable X_;
 };
 
 // Use to evaluate and watch results only, no actual planning
@@ -101,15 +101,15 @@ class EvaluationPlanner : KOMOSparsePlanner
 public:
   EvaluationPlanner(const KOMOPlannerConfig& config,
                     const KOMOFactory& factory,
-                    const arr& x,
+                    const XVariable& X,
                     const std::string& reportFile)
     : KOMOSparsePlanner(config, factory)
-    , x_(x)
+    , X_(X)
     , reportFile_(reportFile)
   {};
   void optimize( Policy &, const rai::Array< std::shared_ptr< const rai::KinematicWorld > > &, bool ) const override;
 
-  arr x_;
+  XVariable X_;
   std::string reportFile_;
 };
 
