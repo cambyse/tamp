@@ -7,10 +7,10 @@ struct KOMOPlannerConfig
 {
   const rai::String beliefStateTag_  = "BELIEF_START_STATE";
 
-  double kinEqualityWeight_  = 1e4;
-  double secPerPhase_        = 10.;
-  double maxConstraint_      = 10 * 0.8;
-  double minMarkovianCost_   = 0;
+  double kinEqualityWeight_  = 1e4; // deprecated
+  double secPerPhase_        = 10.; // viz only
+  double maxConstraint_      = 10. * 0.8;
+  double minMarkovianCost_   = 0.0;
 
   uint microSteps_           = 20; // per phase
 
