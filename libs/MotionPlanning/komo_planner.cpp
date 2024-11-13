@@ -615,7 +615,7 @@ void KOMOPlanner::optimizeMarkovianPath( Policy & policy )
 
 void KOMOPlanner::optimizeMarkovianPathFrom( const Policy::GraphNodeTypePtr & node )
 {
-  std::cout << "optimizing markovian path for:" << node->id() << std::endl;
+  std::cout << "optimizing markovian path to:" << node->id() << std::endl;
 
   bool feasible = true;
 
@@ -638,23 +638,24 @@ void KOMOPlanner::optimizeMarkovianPathFrom( const Policy::GraphNodeTypePtr & no
     // set-up komo
     komo->setModel( kin, true/*, false, true, false, false*/ );
     komo->setTiming( 1.0, config_.microSteps_, config_.secPerPhase_, 2 );
-    komo->setSquaredQAccelerations();
+    komo->setSquaredQAccelerations(); // include velocity and pose costs, based on config file rai.cfg (In binary folder)
     komo->setFixSwitchedObjects( -1., -1., 3e1 ); // This forces a zero velocity at the time where the kinematic switch happens
 
     komo->groundInit();
 
     ///
-    if( node->id() == 20 )
+    if( node->id() == 3 )
     {
       int a{0};
     }
-    komo->groundTasks( 0, node->data().leadingKomoArgs );
-    for(auto parent = node->parent(); parent; parent=parent->parent())
-    {
-      std::cout << "parent:" << parent->id() << std::endl;
-      const double phase = static_cast<double>(parent->depth()) - static_cast<double>(node->depth());
-      //komo->groundTasks( phase, parent->data().leadingKomoArgs );
-    }
+    int verbose = 1;
+    komo->groundTasks( 0, node->data().leadingKomoArgs, verbose );
+//    for(auto parent = node->parent(); parent; parent=parent->parent())
+//    {
+//      std::cout << "parent:" << parent->id() << std::endl;
+//      const double phase = static_cast<double>(parent->depth()) - static_cast<double>(node->depth());
+//      //komo->groundTasks( phase, parent->data().leadingKomoArgs );
+//    }
     ///
 
     komo->reset();
@@ -694,14 +695,16 @@ void KOMOPlanner::optimizeMarkovianPathFrom( const Policy::GraphNodeTypePtr & no
 //      komo->configurations.front()->watch(true);
 //      komo->configurations.last()->watch(true);
 
-//     komo->displayTrajectory();
+//      komo->displayTrajectory();
 
-//      //komo->saveTrajectory( std::to_string( node->id() ) );
-//      //komo->plotVelocity( std::to_string( node->id() ) );
-//      //rai::wait();
+//      komo->saveTrajectory( std::to_string( node->id() ) );
+//      komo->plotVelocity( std::to_string( node->id() ) );
+//      rai::wait();
     }
 
     const Graph result = komo->getReport();
+
+    std::cout << "result:" << result << std::endl;
 
     const double cost = GetCost(result, config_.taskIrrelevantForPolicyCost);
     const double constraints = GetConstraints(result, config_.taskIrrelevantForPolicyCost);//result.get<double>( { "total", "constraints" } );
@@ -709,15 +712,17 @@ void KOMOPlanner::optimizeMarkovianPathFrom( const Policy::GraphNodeTypePtr & no
     markovianPathCosts_      [ node->data().decisionGraphNodeId ] += /*node->data().beliefState[ w ] **/ cost;
     markovianPathConstraints_[ node->data().decisionGraphNodeId ] += /*node->data().beliefState[ w ] **/ constraints;
 
+    std::cout << "costs:" << cost << " constraints:" << constraints << std::endl;
+
     // what to do with the cost and constraints here??
     if( constraints >= config_.maxConstraint_ )
     {
       feasible = false;
 
-      komo->getReport(true);
+      //komo->getReport(true);
       //komo->configurations.first()->watch(true);
       //komo->configurations.last()->watch(true);
-      komo->displayTrajectory();
+      //komo->displayTrajectory();
     }
 
     // update effective kinematic
