@@ -358,7 +358,7 @@ void SensorAlignsWithPivot::phi( arr& y, arr& J, rai::KinematicWorld const& G )
   G.kinematicsPos( sensorPosition, sensorJPosition, sensor );
 
   // intermediary computations
-  // build w1 : (normalized vector from pivot position to object center)
+  // build w1 : normalized vector from pivot position to object center
   arr w = aimPosition - pivotPosition;
   const double normW = norm2( w );
   //std::cout << "normW:" << normW << std::endl;
@@ -368,7 +368,7 @@ void SensorAlignsWithPivot::phi( arr& y, arr& J, rai::KinematicWorld const& G )
   arr Jw = aimJPosition - pivotJPosition;
   arr Jw1 = ( Jw * normW - w * JnormW * Jw ) / ( normW * normW );
 
-  // build u : vector between aiming point and head
+  // build u : vector from sensor position to object center
   arr u = aimPosition - sensorPosition;
   const double normU = norm2( u );
   arr Ju = aimJPosition - sensorJPosition;
