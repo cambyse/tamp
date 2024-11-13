@@ -41,13 +41,6 @@ Rule {
   { (in_sight X)! (is X Y) (identified X)  (NOT_OBSERVABLE is X Y)!}
 }
 
-#deduction of the last block if they have all been identified..(is it rigorous?)
-Rule {
-  X, Y, Z, T
-  { (block X) (block Y) (block Z) (id T) (identified X) (identified Y) (UNEQUAL X Y) (identified Z)! (NOT_OBSERVABLE is Z T)}
-  { (identified Z) (is Z T) (NOT_OBSERVABLE is Z T)!}
-}
-
 #Apply identification to the ON
 Rule {
   X, Y, Z, T
