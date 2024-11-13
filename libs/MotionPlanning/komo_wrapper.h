@@ -10,9 +10,10 @@ namespace mp
 //komo wrapper for tree optimization
 struct KomoWrapper
 {
-  KomoWrapper(KOMO_ext * komo)
+  KomoWrapper(KOMO_ext * komo, int verbose = 0)
     : komo_(komo)
     , world_(komo->world)
+    , verbose_(verbose)
   {
 
   }
@@ -23,6 +24,7 @@ struct KomoWrapper
 
   KOMO_ext * komo_;
   const rai::KinematicWorld & world_;
+  int verbose_{0};
 };
 
 // Subproblems set-up by a tmask (used by sparse ADMM)

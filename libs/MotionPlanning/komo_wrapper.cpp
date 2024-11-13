@@ -117,8 +117,8 @@ void KomoWrapper::setupConfigurations(const std::vector<Vars>& branches)
 
 void KomoWrapper::addObjective(const Interval& it, const TreeBuilder& tree, Feature* map, ObjectiveType type, const arr& target, double scale, int order, int deltaFromStep, int deltaToStep)
 {
-  CHECK(it.time.to != -1.0, "objective with strong influences on other edges are not compatible with markovian paths");
-  CHECK(it.time.from != -1.0, "objective with strong influences on other edges are not compatible with markovian paths");
+  //CHECK(it.time.to != -1.0, "objective with strong influences on other edges are not compatible with markovian paths");
+  //CHECK(it.time.from != -1.0, "objective with strong influences on other edges are not compatible with markovian paths");
 
   if(tree.n_nodes())
   {
@@ -133,10 +133,20 @@ void KomoWrapper::addObjective(const Interval& it, const TreeBuilder& tree, Feat
     obj->scales = /*scale **/ spec.scales;
 
     CHECK(obj->scales.d0 == spec.scales.d0, "wrong dimensionality of the scales!");
+
+    if(verbose_ > 0)
+    {
+      std::cout << obj->name << " vars: " << obj->vars << std::endl;
+    }
   }
   else
   {
-    komo_->addObjective(it.time.from, it.time.to, map, type, target, scale, order, deltaFromStep, deltaToStep);
+     const auto obj = komo_->addObjective(it.time.from, it.time.to, map, type, target, scale, order, deltaFromStep, deltaToStep);
+
+     if(verbose_ > 0)
+     {
+       std::cout << obj->name << " vars: " << obj->vars << std::endl;
+     }
   }
 }
 
