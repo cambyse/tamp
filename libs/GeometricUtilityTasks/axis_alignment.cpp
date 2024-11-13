@@ -13,7 +13,7 @@
     --------------------------------------------------------------  */
 
 #include <axis_alignment.h>
-
+#include <Kin/taskMaps.h>
 //-----AxisAlignment----------------//
 
 using namespace std;
@@ -197,4 +197,64 @@ void ZeroRelativeVel::phi( arr& y, arr& J, const rai::KinematicWorld& G )
   // commit results
   y = tmp_y;
   if(&J) J = tmp_J;
+}
+
+//---ZeroVelocityOfAllXYPhiJoints------------//
+
+
+void ZeroVelocityOfAllXYPhiJoints::phi( arr& y, arr& J, const WorldL& Gs )
+{
+  CHECK(order==1,"");
+  CHECK(Gs.size() >= 1,"");
+
+  const auto dim_Phi{ dim_phi(*Gs(-1))};
+
+  y.resize(dim_Phi);
+  if(!!J){
+    uintA qidx(Gs.N);
+    qidx(0)=0;
+    for(uint i=1;i<Gs.N;i++) qidx(i) = qidx(i-1)+Gs(i-1)->q.N;
+    J = zeros(y.N, qidx.last()+Gs.last()->q.N);
+  }
+
+  uint d{0};
+  for(const auto frame: Gs(-1)->frames)
+  {
+    if(frame->joint && frame->joint->type == rai::JT_transXYPhi)
+    {
+      // get speed vector
+      arr y_vel,Jvel;
+      TM_Default vel(TMT_poseDiff, frame->ID); // to prevent bot velocity and orientation changes
+      vel.order = 1;
+      vel.__phi(y_vel, Jvel, Gs);
+
+      y.setVectorBlock( y_vel, d );
+      if(!!J)
+      {
+        J.setMatrixBlock( Jvel, d, 0 );
+      }
+
+      d+=7;
+    }
+  }
+}
+
+void ZeroVelocityOfAllXYPhiJoints::phi(arr& y, arr& J, const rai::KinematicWorld& G)
+{
+  CHECK(false, "");
+}
+
+
+uint ZeroVelocityOfAllXYPhiJoints::dim_phi( const rai::KinematicWorld& G )
+{
+  uint d = 0;
+  for(const auto frame: G.frames)
+  {
+    if(frame->joint && frame->joint->type == rai::JT_transXYPhi)
+    {
+      d+=7;
+    }
+  }
+
+  return d;
 }
