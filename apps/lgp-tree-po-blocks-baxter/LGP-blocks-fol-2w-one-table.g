@@ -88,4 +88,5 @@ REWARD {
 }
 ### Tasks definitions
 Include = 'LGP-blocks-actions-observations.g'
+Include = 'LGP-blocks-last-block-deduction-3-blocks.g'
 
