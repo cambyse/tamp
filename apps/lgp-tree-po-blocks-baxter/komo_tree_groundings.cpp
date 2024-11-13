@@ -37,7 +37,7 @@ void groundTreeUnStack(const mp::Interval& it, const mp::TreeBuilder& tb, const 
   const auto& object = facts[0].c_str();
 
   /// new version more akin to Franka example
-  mp::Interval all{{it.time.from, it.time.to}, it.edge};
+  mp::Interval all{{it.time.from, it.time.to - 0.01}, it.edge};
   if(activateObjectives)  W(komo).addObjective(all, tb, new LimitsConstraint(0.05), OT_ineq, NoArr, 1.0, 0);
 
   // approach
@@ -56,7 +56,8 @@ void groundTreeUnStack(const mp::Interval& it, const mp::TreeBuilder& tb, const 
   if(komo->k_order > 1)
   {
     mp::Interval just_after{{it.time.to, it.time.to + 0.2}, it.edge};
-    if(activateObjectives) W(komo).addObjective( just_after, tb, new ZeroVelocity( object ), OT_eq, NoArr, 1e2, 1 ); // force the object not to move when starting to pick (mainly to force it not to go under the table)
+    //if(activateObjectives) W(komo).addObjective( just_after, tb, new ZeroVelocity( object ), OT_eq, NoArr, 1e2, 1 ); // force the object not to move when starting to pick (mainly to force it not to go under the table)
+    if(activateObjectives) W(komo).addObjective( all, tb, new ZeroVelocityOfAllXYPhiJoints(), OT_eq, NoArr, 1e2, 1 );
   }
 
   /// former version:
@@ -90,7 +91,7 @@ void groundTreePutDown(const mp::Interval& it, const mp::TreeBuilder& tb, const 
   const auto& object = facts[0].c_str();
   const auto& place = facts[1].c_str();
 
-  mp::Interval all{{it.time.from, it.time.to}, it.edge};
+  mp::Interval all{{it.time.from, it.time.to - 0.01}, it.edge};
   if(activateObjectives)  W(komo).addObjective(all, tb, new LimitsConstraint(0.05), OT_ineq, NoArr, 1.0, 0);
 
   /// Version based on franka example
@@ -98,7 +99,7 @@ void groundTreePutDown(const mp::Interval& it, const mp::TreeBuilder& tb, const 
   // approach
   if(activateObjectives) W(komo).addObjective( before, tb, new TargetPosition( object, place, ARR( 0.0, 0.0, 0.1 ) ), OT_sos, NoArr, 1e2, 0 ); // coming from above
 
-  mp::Interval just_before{{it.time.to - 0.2, it.time.to - 0.001}, it.edge};
+  mp::Interval just_before{{it.time.to - 0.2, it.time.to - 0.01}, it.edge};
   //if(activateObjectives) W(komo).addObjective( just_before, tb, new AxisAlignment( object, ARR( 0, 0, 1.0 ), ARR( 0, 0, 1.0 ) ), OT_sos, NoArr, 1e2, 0 );
 
   mp::Interval end{{it.time.to, it.time.to}, it.edge};
@@ -107,15 +108,14 @@ void groundTreePutDown(const mp::Interval& it, const mp::TreeBuilder& tb, const 
   // switch
   mp::Interval st{{it.time.to, it.time.to}, it.edge};
   Transformation rel{0};
-  rel.rot.setRadZ( 0.0 );
-  //rel.rot.setRadY(-M_PI_2);
   rel.pos.set(0,0, .5*(shapeSize(komo->world, place) + shapeSize(komo->world, object)));
-  W(komo).addSwitch(st, tb, new KinematicSwitch(SW_effJoint, JT_rigid, place, object, komo->world, SWInit_zero, 0, rel));
+  W(komo).addSwitch(st, tb, new KinematicSwitch(SW_effJoint, JT_transXYPhi, place, object, komo->world, SWInit_copy, 0, rel));
 
   if(komo->k_order > 1)
   {
     mp::Interval just_after{{it.time.to, it.time.to + 0.2}, it.edge};
-    if(activateObjectives) W(komo).addObjective( just_after, tb, new ZeroVelocity( object ), OT_eq, NoArr, 1e2, 1 ); // force the object not to move when starting to pick (mainly to force it not to go under the table)
+    //if(activateObjectives) W(komo).addObjective( just_after, tb, new ZeroVelocity( object ), OT_eq, NoArr, 1e2, 1 ); // force the object not to move when starting to pick (mainly to force it not to go under the table)
+    if(activateObjectives) W(komo).addObjective( all, tb, new ZeroVelocityOfAllXYPhiJoints(), OT_eq, NoArr, 1e2, 1 );
   }
 
   /// Former version
@@ -157,6 +157,10 @@ void groundTreeCheck(const mp::Interval& it, const mp::TreeBuilder& tb, const st
 
   /// Former objective
   //if(activateObjectives)  W(komo).addObjective(end, tb, new ActiveGetSight( "head", facts[0].c_str(), ARR( 0.05, 0.01, 0 ), ARR( -0.3, 0, -1.0 ), 0.65 ), OT_eq, NoArr, 1e2, 0 );
+  if(komo->k_order > 1)
+  {
+    if(activateObjectives) W(komo).addObjective( all, tb, new ZeroVelocityOfAllXYPhiJoints(), OT_eq, NoArr, 1e2, 1 );
+  }
 
   if(verbose > 0)
   {
