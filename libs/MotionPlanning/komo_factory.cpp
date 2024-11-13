@@ -83,8 +83,8 @@ void ExtensibleKOMO::groundTasks( double phase, const std::vector< std::string >
   Interval it;
   it.time.from = phase;
   it.time.to = phase + 1.0;
-  it.edge.from = -1;
-  it.edge.to = -1;
+  it.edge.from = 0;
+  it.edge.to = 0;
 
   groundTasks(it, tree, facts, verbose);
 }
