@@ -418,8 +418,8 @@ void plan_Journal_2024()
   matp::MCTSPlanner tp;
   mp::KOMOPlanner mp;
 
-  tp.setR0( -1.0, 1.0 );
-  tp.setNIterMinMax( 500, 100000 );
+  tp.setR0( -1.0, 15.0 );
+  tp.setNIterMinMax( 50000, 100000 );
   tp.setRollOutMaxSteps( 50 );
   tp.setNumberRollOutPerSimulation( 1 );
   tp.setVerbose( false );
