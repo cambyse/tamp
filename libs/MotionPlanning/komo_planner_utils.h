@@ -119,7 +119,7 @@ inline bool isTaskCostIrrelevant(const rai::String& task_name, const rai::String
 
 inline bool isTaskConstraintIrrelevant(const rai::String& task_name, const rai::String& type, const StringA& filtered_tasks)
 {
-  if(type != "eq" || type != "ineq")
+  if(type != "eq" && type != "ineq")
   {
     return true;
   }
