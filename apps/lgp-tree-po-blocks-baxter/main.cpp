@@ -425,9 +425,12 @@ void plan_Journal_2024()
   tp.setVerbose( false );
 
   mp.setNSteps( 20 );
-  mp.setMinMarkovianCost( 0.00 );
-  mp.setMaxConstraint( 15.0 );
-  mp.addCostIrrelevantTask( "SensorDistanceToObject" );
+  mp.addCostIrrelevantTask( "FixSwichedObjects" );
+  mp.addCostIrrelevantTask( "LimitsConstraint" );
+
+  //mp.setMinMarkovianCost( 0.00 );
+  //mp.setMaxConstraint( 15.0 );
+  //mp.addCostIrrelevantTask( "SensorDistanceToObject" );
 
   // set start configurations
   // D
@@ -479,8 +482,8 @@ void plan_Journal_2024()
   // build and run tamp controller
   ObjectManipulationTAMPController tamp(tp, mp);
   TAMPlanningConfiguration config;
-  config.watchMarkovianOptimizationResults = false;
-  config.watchJointOptimizationResults = false;
+  config.watchMarkovianOptimizationResults = true;
+  config.watchJointOptimizationResults = true;
   tamp.plan(config);
 }
 
