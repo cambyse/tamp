@@ -220,11 +220,11 @@ void groundTreeCheck(const mp::Interval& it, const mp::TreeBuilder& tb, const st
     {"side_5", ARR( 0.00, 0.00, -0.05 )}
   };
 
-  mp::Interval end{{it.time.to - 0.2, it.time.to}, it.edge};
-  if(activateObjectives) W(komo).addObjective(end, tb, new SensorAimAtObjectCenter( eff, object, ARR( 0, 0, -1 ) ), OT_eq, NoArr, SensorAimAtObjectCenter_scale, 0 );
-  if(activateObjectives) W(komo).addObjective(end, tb, new SensorAlignsWithPivot( eff, object, sideToPivot[facts[1]], 45.0 * 3.1415 / 180.0 ), OT_ineq, NoArr, SensorAlignsWithPivot_scale, 0 );
+  mp::Interval end{{it.time.to - 0.2, it.time.to - 0.01}, it.edge};
+  if(activateObjectives) W(komo, verbose).addObjective(end, tb, new SensorAimAtObjectCenter( eff, object, ARR( 0, 0, -1 ) ), OT_eq, NoArr, SensorAimAtObjectCenter_scale, 0 );
+  if(activateObjectives) W(komo, verbose).addObjective(end, tb, new SensorAlignsWithPivot( eff, object, sideToPivot[facts[1]], 45.0 * 3.1415 / 180.0 ), OT_ineq, NoArr, SensorAlignsWithPivot_scale, 0 );
   //if(activateObjectives) W(komo).addObjective(end, tb, new SensorAlignsWithPivot( eff, object, sideToPivot[facts[1]], 45.0 * 3.1415 / 180.0 ), OT_sos, NoArr, 5e1, 0 );
-  if(activateObjectives) W(komo).addObjective(end, tb, new SensorDistanceToObject( eff, object, 0.2, 0.0 ), OT_sos, NoArr, SensorDistanceToObject_scale, 0 );
+  if(activateObjectives) W(komo, verbose).addObjective(end, tb, new SensorDistanceToObject( eff, object, 0.2, 0.0 ), OT_sos, NoArr, SensorDistanceToObject_scale, 0 );
 
   if(verbose > 0)
   {
