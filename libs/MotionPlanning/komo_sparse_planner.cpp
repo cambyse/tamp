@@ -102,7 +102,7 @@ void KOMOSparsePlanner::groundPolicyActionsJoint( const TreeBuilder & tree,
         interval.edge = {p->id(), q->id()};
 
         // square acc + fix switched objects
-        W(komo.get()).addObjective(interval, tree, new TM_Transition(komo->world), OT_sos, NoArr, 1.0, 2);
+        W(komo.get()).addObjective(interval, tree, new TM_Transition(komo->world), OT_sos, NoArr, 1.0, 2); // include velocity and pose costs, based on config file rai.cfg (In binary folder)
         W(komo.get()).addObjective(interval, tree, new TM_FixSwichedObjects(), OT_eq, NoArr, TM_FixSwichedObjects_scale, 2); // This forces a zero velocity at the time where the kinematic switch happens
 
         // ground other tasks
@@ -240,19 +240,30 @@ OptimizationReport KOMOSparsePlanner::getOptimizationReport(const std::shared_pt
     double task_cost{0.0};
 
     /// DEBUG
-    //const std::string task_name_str( task->name.p );
-    //bool verbose = (task_name_str.find("TargetPosition") != std::string::npos);
+//    const std::string task_name_str( task->name.p );
+//    bool bc1 = (task_name_str.find("SensorAlignsWithPivot") != std::string::npos);
     ///
 
     const double global_scale = 1.0; //task->map->scale.N ? task->map->scale(0) : 1.0; already applied by phi!
 
     for(uint t=0;t<task->vars.d0;t++)
     {
+
       CHECK(task->map->order + 1 == task->vars.d1, "inconsistent tm order!");
 
       for( uint s=0; s < task->vars.d1; ++s )
       {
         const auto global = task->vars(t, s) + komo->k_order;
+
+        /// DEBUG
+//        if(bc1) std::cout << "check vars:" << task->vars << std::endl;
+//        bool bc2 = (global == 41);
+//        if(bc1 && bc2)
+//        {
+//          int a{0};
+//          //komo->configurations(global)->watch(true);
+//        }
+        ///
 
         CHECK(global >= 0 && global < komo->configurations.d0, "");
 
@@ -281,11 +292,13 @@ OptimizationReport KOMOSparsePlanner::getOptimizationReport(const std::shared_pt
       }
       else if(task->type==OT_eq)
       {
-        // TODO: sumOfSqr ? or max abs?
+        report.slices[global_task_time].objectivesResults[std::string(task->name.p)] = absMax(y);
       }
       else if(task->type==OT_ineq)
       {
         // TODO: max? or sumOfSqr of violations?
+        for(auto i = 0; i < y.d0; ++i) if(y(i) < 0.0) {y(i) = 0.0;}
+        report.slices[global_task_time].objectivesResults[std::string(task->name.p)] = absMax(y);
       }
     }
 
