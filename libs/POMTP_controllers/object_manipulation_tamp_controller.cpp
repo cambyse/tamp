@@ -89,6 +89,12 @@ Policy ObjectManipulationTAMPController::plan( const TAMPlanningConfiguration & 
 
   savePolicyToFile( policy, "-final" );
 
+  if(policy.value() < -1.0e6)
+  {
+    std::cout << "No solution found! try to increaste C_MCTS!" << std::endl;
+    return policy;
+  }
+
   { // evaluate and display markovian -> output in optimizationReportMarkovianPathTree.re
     auto po     = MotionPlanningParameters( policy.id() );
     po.setParam( "type", "EvaluateMarkovianCosts" );
