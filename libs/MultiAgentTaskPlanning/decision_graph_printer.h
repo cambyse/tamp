@@ -182,4 +182,180 @@ private:
   Rewards rewards_;
 };
 
+template <typename T>
+class MCTSTreePrinterCondensed // for paper, less edges and nodes
+{
+public:
+  MCTSTreePrinterCondensed( std::ostream & ss,
+                   const std::string& state,
+                   const Rewards& rewards,
+                   const Values& values,
+                   std::size_t maxDepth,
+                   std::size_t fromNodeId
+                  )
+    : ss_( ss )
+    , mctsState_( state )
+    , maxDepth_( maxDepth )
+    , fromNodeId_( fromNodeId )
+  {
+
+  }
+
+  void print( const T & graph )
+  {
+    if( ! graph.root() )
+    {
+      return;
+    }
+
+    //edges_ = graph.edges();
+
+    ss_ << "digraph g{" << std::endl;
+    ss_ << "labelloc=\"t\"" << std::endl;
+    ss_ << "label=\"" << mctsState_ << "\"" << std::endl;
+    ss_ << "bgcolor=\"transparent\"";
+    ss_ << "{" << std::endl;
+    ss_ << graph.root()->id() << " [style=filled, fillcolor=blue]" << std::endl;
+
+    ss_ << "}" << std::endl;
+
+    saveTreeFrom( graph.root(), graph, 0, false );
+
+    ss_ << "}" << std::endl;
+  }
+
+private:
+  void printNode( const typename T::GraphNodeType::ptr & node, const T & graph )
+  {
+//    if( node->data().nodeType == MCTSNodeData::NodeType::OBSERVATION )
+//    {
+//      // skip nodes that
+//      if(node->children().size() == 1 )
+//      {
+//        return;
+//      }
+//    }
+
+    ss_ << node->id() << " [shape=square, style=filled, fillcolor=" << ( node->id() == 0 ? "blue" : "cyan" ) << "]" << std::endl;
+
+//    if( node->id() == 13 )
+//    {
+//      int a{0};
+//    }
+
+    if( node->data().nodeType == MCTSNodeData::NodeType::OBSERVATION )
+    {
+      ss_ << node->id() << " [shape=circle]" << std::endl;
+    }
+
+    std::stringstream ss;
+    ss << std::fixed;
+    ss << std::setprecision(2);
+    ss << node->id();
+
+    ss_ << node->id() << " [label=\"" << ss.str() << "\"" << "]" << std::endl;
+
+    if(node->data().terminal)
+    {
+      ss_ << node->id() << " [style=filled, fillcolor=green]" << std::endl;
+    }
+    else if(node->data().isPotentialSymbolicSolution)
+    {
+      ss_ << node->id() << " [style=filled, fillcolor=aquamarine]" << std::endl;
+    }
+  }
+
+  void printEdge( const typename T::GraphNodeType::ptr & from, const typename T::GraphNodeType::ptr & to, const T & graph )
+  {
+    std::stringstream ss;
+    std::string label;
+
+    const auto p = transitionProbability( graph.beliefStates_.at(from->data().beliefState_h),
+                                          graph.beliefStates_.at(to->data().beliefState_h)
+                                        );
+
+    if( from->data().nodeType == MCTSNodeData::NodeType::ACTION )
+    {
+      auto actionLabel = graph.actions_.at( to->data().leadingAction_h);
+
+      boost::replace_all(actionLabel, "(", "");
+      boost::replace_all(actionLabel, ")", "");
+
+      ss << actionLabel;
+
+      label = ss.str();
+      boost::replace_all(label, "{", "");
+
+//      if(from->id() == 11 && to->id() == 14)
+//      {
+//        int a = 0;
+//      }
+
+      // comment here to filter obs nodes with only one obs
+      ss_ << from->id() << "->" << to->id() << " [ label=\"" << label << "\" ]" << ";" << std::endl;
+
+      // uncomment here to filter obs nodes with only one obs
+//      if( to->children().size() > 1 )
+//      { // several observations -> we display the observation node, and the edge action -> observation
+//        ss_ << from->id() << "->" << to->id() << " [ label=\"" << label << "\" ]" << ";" << std::endl;
+//      }
+//      if( to->children().size() == 1 )
+//      { // observation node is skipped
+//        ss_ << from->id() << "->" << to->children().front()->id() << " [ label=\"" << label << "\" ]" << ";" << std::endl;
+//      }
+//      if( to->children().size() == 0 )
+//      {
+//        ss_ << from->id() << "->" << to->id() << " [ label=\"" << label << "\" ]" << ";" << std::endl;
+//      }
+    }
+    else
+    {
+      if(from->children().size() > 1)
+      {
+        ss << getObservation( from, to, graph );
+        ss << p;
+      }
+
+      label = ss.str();
+
+      // comment here to filter obs nodes with only one obs
+      ss_ << from->id() << "->" << to->id() << " [ label=\"" << label << "\" ]" << ";" << std::endl;
+
+      // uncomment here to filter obs nodes with only one obs
+//      if(from->children().size() > 1)
+//      {
+//        ss_ << from->id() << "->" << to->id() << " [ label=\"" << label << "\" ]" << ";" << std::endl;
+//      }
+    }
+  }
+
+  void saveTreeFrom( const typename T::GraphNodeType::ptr & node, const T & graph, std::size_t depth, bool printedUpToNode )
+  {
+    if( depth > maxDepth_ )
+    {
+      return;
+    }
+
+    const auto printFromNode = printedUpToNode || ( node->id() == fromNodeId_ );
+
+    if( printFromNode ) printNode( node, graph );
+
+    // print edge
+    for( const auto& c : node->children() )
+    {
+      if( c->id() > 25 )
+        continue;
+
+      if( printFromNode ) printEdge( node, c, graph );
+
+      saveTreeFrom( c , graph, printFromNode ? depth + 1 : depth, printFromNode );
+    }
+  }
+private:
+  std::ostream & ss_;
+  std::string mctsState_;
+  std::size_t maxDepth_;
+  std::size_t fromNodeId_;
+};
+
 }
