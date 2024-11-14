@@ -106,7 +106,8 @@ void KOMOSparsePlanner::groundPolicyActionsJoint( const TreeBuilder & tree,
         W(komo.get()).addObjective(interval, tree, new TM_FixSwichedObjects(), OT_eq, NoArr, TM_FixSwichedObjects_scale, 2); // This forces a zero velocity at the time where the kinematic switch happens
 
         // ground other tasks
-        komo->groundTasks(interval, tree, q->data().leadingKomoArgs, 1);
+        int verbose{0};
+        komo->groundTasks(interval, tree, q->data().leadingKomoArgs, verbose);
 
         visited.insert(q->id());
       }
@@ -523,7 +524,8 @@ void ADMMCompressedPlanner::groundPolicyActionsCompressed( const TreeBuilder & f
         W(komo.get()).addObjective(interval, compressed, new TM_FixSwichedObjects(), OT_eq, NoArr, TM_FixSwichedObjects_scale, 2);
 
         // ground other tasks
-        komo->groundTasks(interval, compressed, q->data().leadingKomoArgs, 1);
+        int verbose{0};
+        komo->groundTasks(interval, compressed, q->data().leadingKomoArgs, verbose);
 
         visited.insert(q->id());
       }
