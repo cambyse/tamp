@@ -153,6 +153,7 @@ void KomoWrapper::addObjective(const Interval& it, const TreeBuilder& tree, Feat
 void KomoWrapper::addSwitch(const Interval& it, const TreeBuilder& tree, KinematicSwitch * sw)
 {
   CHECK(it.time.from == it.time.to, "Wrong interval for a switch");
+  CHECK(it.time.from >= 0.0, "No kinematic switches in the past!");
 
   if(tree.n_nodes())
   {
