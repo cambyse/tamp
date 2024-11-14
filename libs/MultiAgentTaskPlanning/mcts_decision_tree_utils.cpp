@@ -89,13 +89,23 @@ std::size_t sampleStateIndex( const std::vector< double >& bs )
 
 GraphNode< MCTSNodeData >::ptr getMostPromisingChild( const GraphNode< MCTSNodeData >::ptr& node, const double c, const bool verbose )
 {
+  //Epsilon greedy mechanism
+//  const auto v = ( ( double ) rand() / ( RAND_MAX ) );
+//  if(v < 0.5) // choose randomly
+//  {
+//    const auto w = ( ( double ) rand() / ( RAND_MAX ) );
+
+//    uint index = w * node->children().size();
+//    return *std::next(node->children().begin(), index);
+//  }
+
   double max_prio{std::numeric_limits<double>::lowest()};
   GraphNode< MCTSNodeData >::ptr best_uct_child{};
   for( const auto& child : node->children() )
   {
     const auto prio = priorityUCT( child, c, verbose );
 
-    if( prio > max_prio + 1.0e-5 ) // epsilon added to break tie and have fuly reproducilb esearch also when scaling r0
+    if( prio > max_prio + 1.0e-5 ) // epsilon added to break tie and have fuly reproducible search also when scaling r0
     {
       max_prio = prio;
       best_uct_child = child;
