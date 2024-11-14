@@ -220,7 +220,7 @@ std::vector< std::tuple< TreeBuilder, TreeBuilder, Mapping > > get_subproblems(c
     auto compressed = uncompressed.compressed(mapping); // compress so that it has its own opt variable
     subproblems.push_back(std::tuple< TreeBuilder, TreeBuilder, Mapping >{uncompressed, compressed, mapping});
 
-    std::cout << "uncompressed:\n" << uncompressed << std::endl;
+    //std::cout << "uncompressed:\n" << uncompressed << std::endl;
   }
 
   return subproblems;
