@@ -62,7 +62,7 @@ public:
 
       CHECK( n->data().nodeType == T::GraphNodeDataType::NodeType::ACTION, "Value iteration performed on action nodes only!" );
 
-      // compute value of observation parent, compute value of parent taking different potenial observations into accound
+      // compute value of observation parent, compute value of parent taking different potential observations into account
       double value = 0.0;
       auto siblings = n->siblings();
       siblings.push_back( n );
