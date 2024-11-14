@@ -72,7 +72,7 @@ void MCTSDecisionTree::expandMCTS( const double r0,
     // sample state
     const auto stateIndex = sampleStateIndex( beliefState );
 
-    if(n_iter % 10 == 0) log(n_iter, stateIndex);//std::cout << "\n-------" << n_iter << "-------(stateIndex=" << stateIndex << ")" << std::endl;
+    if(n_iter % 100 == 0) log(n_iter, stateIndex);//std::cout << "\n-------" << n_iter << "-------(stateIndex=" << stateIndex << ")" << std::endl;
 
     simulate( root_, stateIndex, 0, r0, rolloutMaxSteps, nRolloutsPerSimulation, c, expandedNodesIds, verbose );
 
@@ -627,6 +627,7 @@ void MCTSDecisionTree::saveMCTSTreeToFile( const std::string & filename,
   file.open( filename );
 
   MCTSTreePrinter<MCTSDecisionTree> printer( file, mctsState, rewards, values, 3, 0 );
+  //MCTSTreePrinterCondensed<MCTSDecisionTree> printer( file, mctsState, rewards, values, 10, 0 );
   printer.print( *this );
 
   file.close();
