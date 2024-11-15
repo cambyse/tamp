@@ -84,7 +84,7 @@ Policy MCTSPlanner::getPolicy() const
 
 void MCTSPlanner::expandMCTS()
 {
-  tree_.expandMCTS( rewards_.R0(),
+  tree_.expandMCTS( -1.0, // akin to R0
                     nIterMin_,
                     nIterMax_,
                     rollOutMaxSteps_,

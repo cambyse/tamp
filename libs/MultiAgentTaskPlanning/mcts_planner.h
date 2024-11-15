@@ -31,7 +31,7 @@ public:
   virtual void integrate( const Policy & policy ) override;
 
   // other setters
-  void setR0( double r0, double explorationScaling ) { rewards_.setR0(r0); explorationTermC_ = std::fabs(r0) * explorationScaling; } // force here the C and R0 to be in sync see (Alg 1. in https://papers.nips.cc/paper_files/paper/2010/file/edfbe1afcf9246bb0d40eb4d8027d90f-Paper.pdf)
+  void setR0( double r0, double explorationScaling ) { rewards_.setR0(r0); explorationTermC_ = explorationScaling; } // force here the C and R0 to be in sync see (Alg 1. in https://papers.nips.cc/paper_files/paper/2010/file/edfbe1afcf9246bb0d40eb4d8027d90f-Paper.pdf)
   void setNIterMinMax( std::size_t nMin, std::size_t nMax ) { nIterMin_ = nMin; nIterMax_ = nMax; }
   void setNumberRollOutPerSimulation( std::size_t n ) { nRollOutsPerSimulation_ = n; }
   void setRollOutMaxSteps( std::size_t nMaxSteps ) { rollOutMaxSteps_ = nMaxSteps; }
