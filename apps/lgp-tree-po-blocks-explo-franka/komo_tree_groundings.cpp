@@ -139,6 +139,9 @@ void groundTreePickUp(const mp::Interval& it, const mp::TreeBuilder& tb, const s
 
 void groundTreeUnStack(const mp::Interval& it, const mp::TreeBuilder& tb, const std::vector<std::string>& facts, KOMO_ext* komo, int verbose)
 {
+//  mp::Interval all{{it.time.from, it.time.to - 0.01}, it.edge};
+//  if(activateObjectives)  W(komo).addObjective(all, tb, new LimitsConstraint(0.05), OT_ineq, NoArr, 1.0, 0);
+
   const auto& eff = "franka_hand";
   const auto& object = facts[0].c_str();
   const bool flipped = (facts[2] == "TRUE");
@@ -170,6 +173,9 @@ void groundTreeUnStack(const mp::Interval& it, const mp::TreeBuilder& tb, const 
 
 void groundTreePutDown(const mp::Interval& it, const mp::TreeBuilder& tb, const std::vector<std::string>& facts, KOMO_ext* komo, int verbose)
 {
+//  mp::Interval all{{it.time.from, it.time.to - 0.01}, it.edge};
+//  if(activateObjectives)  W(komo).addObjective(all, tb, new LimitsConstraint(0.05), OT_ineq, NoArr, 1.0, 0);
+
   const auto& object = facts[0].c_str();
   const auto& place = facts[1].c_str();
 
@@ -208,6 +214,9 @@ void groundTreePutDownFlipped(const mp::Interval& it, const mp::TreeBuilder& tb,
 
 void groundTreeCheck(const mp::Interval& it, const mp::TreeBuilder& tb, const std::vector<std::string>& facts, KOMO_ext* komo, int verbose)
 {
+//  mp::Interval all{{it.time.from, it.time.to - 0.01}, it.edge};
+//  if(activateObjectives)  W(komo).addObjective(all, tb, new LimitsConstraint(0.05), OT_ineq, NoArr, 1.0, 0);
+
   const auto& eff = "franka_hand";
   const auto& object = facts[0].c_str();
 
