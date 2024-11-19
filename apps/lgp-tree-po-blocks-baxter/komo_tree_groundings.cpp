@@ -149,8 +149,7 @@ void groundTreeCheck(const mp::Interval& it, const mp::TreeBuilder& tb, const st
   mp::Interval all{{it.time.from, it.time.to - 0.01}, it.edge};
   if(activateObjectives)  W(komo).addObjective(all, tb, new LimitsConstraint(0.05), OT_ineq, NoArr, 1.0, 0);
 
-  //mp::W(komo).addObjective(start, end, branch, new ActiveGetSight( "head", facts[0].c_str(), ARR( 0.05, 0.01, 0 ), ARR( -1, 0, 0 ), 0.65 ), OT_sos, NoArr, 1e2,0 ); // slight offset (0.01) to break symmetry and avoid quternion normalization problem
-  mp::Interval end{{it.time.to-0.2, it.time.to - 0.01}, it.edge};
+  mp::Interval end{{it.time.to-0.2, it.time.to - 0.01}, it.edge}; // start at -0.5 for paper plots
   if(activateObjectives) W(komo, verbose).addObjective(end, tb, new SensorAimAtObjectCenter( "head", facts[0].c_str(), ARR( -0.3, 0, -1.0 ) ), OT_eq, NoArr, 5.0e1, 0 );
   if(activateObjectives) W(komo, verbose).addObjective(end, tb, new SensorAlignsWithPivot( "head", facts[0].c_str(), ARR( 0.05, 0.0, 0.0 ), 45.0 * 3.1415 / 180.0 ), OT_ineq, NoArr, 1e2, 0 );
   if(activateObjectives) W(komo, verbose).addObjective(end, tb, new SensorDistanceToObject( "head", facts[0].c_str(), 0.5, 0.0 ), OT_sos, NoArr, 1e2, 0 );

@@ -253,21 +253,21 @@ void display_robot()
   }
 }
 
-void decision_tree_2_blocks()
+void decision_tree()
 {
   matp::MCTSPlanner tp;
   //matp::MCTSPlannerBs tp;
 
   srand(2);
 
-  tp.setR0( -1.0, 1.0 );
-  tp.setNIterMinMax( 500, 100000 );
-  tp.setRollOutMaxSteps( 50 );
+  tp.setR0( -1.0, 50.0 );
+  tp.setNIterMinMax( 500000, 1000000 );
+  tp.setRollOutMaxSteps( 100 );
   tp.setNumberRollOutPerSimulation( 1 );
   tp.setVerbose( false );
 
-//  tp.setFol( "LGP-1-block-6-sides-fol.g" );
-  tp.setFol( "LGP-blocks-fol-2w-one-table_for_display.g" );
+  tp.setFol( "LGP-blocks-fol-one-table-no-precondition.g" );
+  //tp.setFol( "LGP-blocks-fol-2w-one-table_for_display.g" ); / for paper
 
   // SOLVE
   auto start = std::chrono::high_resolution_clock::now();
@@ -278,7 +278,6 @@ void decision_tree_2_blocks()
   std::cout << "planning time (ms): " << std::chrono::duration_cast< std::chrono::milliseconds >(elapsed).count() << std::endl;
   tp.saveMCTSGraphToFile( "decision_tree.gv" );
   generatePngImage( "decision_tree.gv" );
-
 
   // BUILD POLICY
   auto policy = tp.getPolicy();
@@ -412,14 +411,14 @@ void plan_3_methods()
 
 void plan_Journal_2024()
 {
-  srand(1);
+  //srand(1);
 
   // build planner
   matp::MCTSPlanner tp;
   mp::KOMOPlanner mp;
 
-  tp.setR0( -1.0, 20.0 );
-  tp.setNIterMinMax( 50000, 100000 );
+  tp.setR0( -1.0, 15.0 );
+  tp.setNIterMinMax( 100000, 1000000 );
   tp.setRollOutMaxSteps( 50 );
   tp.setNumberRollOutPerSimulation( 1 );
   tp.setVerbose( false );
@@ -428,35 +427,51 @@ void plan_Journal_2024()
   mp.addCostIrrelevantTask( "FixSwichedObjects" );
   mp.addCostIrrelevantTask( "LimitsConstraint" );
 
-  //mp.setMinMarkovianCost( 0.00 );
-  //mp.setMaxConstraint( 15.0 );
-  //mp.addCostIrrelevantTask( "SensorDistanceToObject" );
-
   // set start configurations
-  // D
-  //tp.setFol( "LGP-blocks-fol-one-table-no-precondition.g" );
-  //mp.setKin( "LGP-blocks-kin-one-table.g" );
+//  // D
+//  {
+//    tp.setR0( 10.0, 50.0 );
+//    tp.setNIterMinMax( 1000000, 10000000 ); // 1000000 - by default
+//    tp.setRollOutMaxSteps( 100 );
+//      tp.setFol( "LGP-blocks-fol-one-table-no-precondition.g" );
+//      mp.setKin( "LGP-blocks-kin-one-table.g" );
+//  }
+//  // C
+//  {
+//    tp.setR0( -1.0, 15.0 ); // -10.0, -0.1
+//    tp.setNIterMinMax( 100000, 1000000 );
+//    tp.setRollOutMaxSteps( 50 );
 
-  // C
-  //tp.setFol( "LGP-blocks-fol-one-table.g" );
-  //mp.setKin( "LGP-blocks-kin-one-table.g" );
+//    tp.setFol( "LGP-blocks-fol-one-table.g" );
+//    mp.setKin( "LGP-blocks-kin-one-table.g" );
+//  }
 
   // checked, probably doesn't work with n steps = 5
   // B
-  tp.setFol( "LGP-blocks-fol-2w-one-table.g" );
-  //tp.setFol( "LGP-blocks-fol-2w-one-table-no-precondition.g" );
-  mp.setKin( "LGP-blocks-kin-2w-one-table.g" );
+  {
+    tp.setR0( -1.0, 15.0 ); // -10.0, -0.1
+    tp.setNIterMinMax( 100000, 1000000 );
+    tp.setRollOutMaxSteps( 50 );
+    tp.setFol( "LGP-blocks-fol-2w-one-table.g" );
+    //tp.setFol( "LGP-blocks-fol-2w-one-table-no-precondition.g" );
+    mp.setKin( "LGP-blocks-kin-2w-one-table.g" );
+  }
 
   // A
-  //tp.setFol( "LGP-blocks-fol-1w-one-table.g" );
-  //tp.setFol( "LGP-blocks-fol-1w-one-table-no-precondition.g" );
-  //mp.setKin( "LGP-blocks-kin-1w-one-table.g" );
+//  {
+//    tp.setR0( -10.0, 15.0 ); // -10.0, -0.1
+//    tp.setNIterMinMax( 50000, 1000000 );
+//    tp.setRollOutMaxSteps( 50 );
+//    tp.setFol( "LGP-blocks-fol-1w-one-table.g" );
+//    //tp.setFol( "LGP-blocks-fol-1w-one-table-no-precondition.g" );
+//    mp.setKin( "LGP-blocks-kin-1w-one-table.g" );
+//  }
 
   // 4 blocks linear
   //tp.setFol( "LGP-blocks-fol-4-blocks-1w-one-table.g" );
   //mp.setKin( "LGP-blocks-kin-4-blocks-1w-one-table.g" );
 
-  // 4 blocks new version
+  // 4 blocks new version -> probably an issue with the logic -> check with franka if this is necessary to have this one working
   //tp.setFol( "LGP-blocks-fol-4-blocks-24w-one-table.g" );
   //mp.setKin( "LGP-blocks-kin-4-blocks-24w-one-table.g" );
   //tp.setFol( "LGP-blocks-fol-1w-unified-4-blocks-new.g" );
@@ -504,7 +519,7 @@ int main(int argc,char **argv)
 
   /// methods for creating materail for the thesis
   //display_robot();
-  //decision_tree_2_blocks();
+  //decision_tree();
 
   plan_Journal_2024();
 
