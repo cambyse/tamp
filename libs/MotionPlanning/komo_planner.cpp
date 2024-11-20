@@ -133,7 +133,7 @@ static double GetConstraints(const Graph& result, const StringA& filtered_tasks)
 //  return total_cost;
 //}
 
-void KOMOPlanner::setKin( const std::string & kinDescription )
+void KOMOPlanner::setKin( const std::string & kinDescription, const arr& q )
 {
   Graph G = loadKin(kinDescription);
 
@@ -144,6 +144,11 @@ void KOMOPlanner::setKin( const std::string & kinDescription )
     computeMeshNormals( kin->frames );
     kin->calc_fwdPropagateFrames();
     //kin->watch(/*true*/);
+
+    if(!!q)
+    {
+      kin->setJointState(q);
+    }
 
     startKinematics_.append( kin );
   }
@@ -175,6 +180,11 @@ void KOMOPlanner::setKin( const std::string & kinDescription )
       //if( w == 5 )
       //kin->watch( true );
       //
+      if(!!q)
+      {
+        kin->setJointState(q);
+      }
+
       startKinematics_.append( kin );
     }
   }
@@ -398,75 +408,6 @@ void KOMOPlanner::displayMarkovianPaths( const Policy & policy, double sec ) con
   }
 }
 
-//arr KOMOPlanner::getMarkovianPathTree( const Policy & policy ) const
-//{
-//  // This method assumes a constant qdim, which is not possible for more complex kinematic switches!
-//  arr x;
-
-//  const auto tree = buildTree(policy);
-
-//  // build a map policy id -> decision graph id
-//  std::unordered_map<uint, uint> nodeIdToDecisionGraphId = GetNodeIdToDecisionGraphIds(policy);
-
-//  // go through policy and gather planned configurations
-//  const auto q_dim = startKinematics_.front()->q.d0;
-//  x.resize((tree.n_nodes() - 1) * config_.microSteps_ * q_dim);
-//  std::unordered_set<uint> visited;
-
-//  for(const auto& l: policy.sleaves())
-//  {
-//    auto q = l;
-//    auto p = q->parent();
-
-//    const auto branch= tree._get_branch(l->id());
-
-//    while(p)
-//    {
-//      if(visited.find(q->id()) == visited.end())
-//      {
-//        double start = p->depth();
-//        double end = q->depth();
-
-//        const auto var_0 = tree.get_vars0(TimeInterval{start, end}, branch, config_.microSteps_);
-//        const auto decision_graph_id = nodeIdToDecisionGraphId.at(q->id());
-//        const auto& witness_path_piece = markovianPaths_.at(decision_graph_id);
-
-//        for(uint s=0; s < witness_path_piece.d0 - markovian_path_k_order_; ++s)
-//        {
-//          const auto global = var_0(s);
-//          const auto & kin = witness_path_piece(s + markovian_path_k_order_);
-
-//          for(uint i=0; i < q_dim; ++i)
-//          {
-//            const auto global_i = global * q_dim + i;
-//            CHECK(x(global_i) == 0.0, "overrides part of x already gathered, it is most likely a bug!");
-//            x(global_i) = kin.q(i);
-//          }
-//        }
-
-//        // double check connection integrity
-//        if(p->id() != 0)
-//        {
-//          const auto parent_decision_graph_id = nodeIdToDecisionGraphId.at(p->id());
-//          const auto& witness_parent_path_piece = markovianPaths_.at(parent_decision_graph_id);
-////          std::cout << "check transition " << p->data().decisionGraphNodeId << "->" << q->data().decisionGraphNodeId << " (" << p->id() << "->" << q->id() << ")" << std::endl;
-////          std::cout << witness_path_piece(0).q << " vs. " << witness_parent_path_piece(-2).q << std::endl;
-////          std::cout << witness_path_piece(1).q << " vs. " << witness_parent_path_piece(-1).q << std::endl;
-
-//          CHECK(witness_parent_path_piece(-2).q == witness_path_piece(0).q, "wrong order 2 connection!");
-//        }
-//        //
-
-//        visited.insert(q->id());
-//      }
-//      q = p;
-//      p = q->parent();
-//    }
-//  }
-
-//  return x;
-//}
-
 XVariable KOMOPlanner::getMarkovianPathTreeVariableQDim( const Policy & policy ) const
 {
   // build a map policy id -> decision graph id
@@ -615,7 +556,7 @@ void KOMOPlanner::optimizeMarkovianPath( Policy & policy )
 
 void KOMOPlanner::optimizeMarkovianPathFrom( const Policy::GraphNodeTypePtr & node )
 {
-  std::cout << "optimizing markovian path to:" << node->id() << std::endl;
+  std::cout << "------------optimizing markovian path to:" << node->id() << "-------------" << std::endl;
 
   bool feasible = true;
 
@@ -640,23 +581,12 @@ void KOMOPlanner::optimizeMarkovianPathFrom( const Policy::GraphNodeTypePtr & no
     komo->setTiming( 1.0, config_.microSteps_, config_.secPerPhase_, 2 );
     komo->setSquaredQAccelerations(); // include velocity and pose costs, based on config file rai.cfg (In binary folder)
     komo->setFixSwitchedObjects( -1., -1., 3e1 ); // This forces a zero velocity at the time where the kinematic switch happens
-
+//    komo->setFixEffectiveJoints();
     komo->groundInit();
 
-    ///
-    if( node->id() == 3 )
-    {
-      int a{0};
-    }
-    int verbose = 1;
+    // ground symbols
+    int verbose = 0;
     komo->groundTasks( 0, node->data().leadingKomoArgs, verbose );
-//    for(auto parent = node->parent(); parent; parent=parent->parent())
-//    {
-//      std::cout << "parent:" << parent->id() << std::endl;
-//      const double phase = static_cast<double>(parent->depth()) - static_cast<double>(node->depth());
-//      //komo->groundTasks( phase, parent->data().leadingKomoArgs );
-//    }
-    ///
 
     komo->reset();
 
@@ -674,6 +604,16 @@ void KOMOPlanner::optimizeMarkovianPathFrom( const Policy::GraphNodeTypePtr & no
         komo->configurations(s)->copy(kin);
       }
     }
+//    else
+//    {
+//      kin.watch(true);
+//    }
+
+//    if(node->children().empty()) // leaf
+//    {
+//      komo->configurations(-1)->setJointState(startKinematics_( w )->q);
+//      komo->configurations(-2)->setJointState(startKinematics_( w )->q);
+//    }
 
     // run
     try {
