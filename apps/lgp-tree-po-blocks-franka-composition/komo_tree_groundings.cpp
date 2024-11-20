@@ -10,6 +10,7 @@
 #include <Kin/TM_AboveBox.h>
 #include <Kin/TM_qLimits.h>
 
+#include <kin_equality_task.h>
 #include <observation_tasks.h>
 #include <axis_alignment.h>
 
@@ -19,6 +20,26 @@ using W = mp::KomoWrapper;
 constexpr bool activateObjectives{true};
 
 double shapeSize(const KinematicWorld& K, const char* name, uint i=2);
+
+double BlockToPositionX(const std::string& block, const std::string& place)
+{
+  if(place.find("block") != std::string::npos)
+  {
+    return 0.0;
+  }
+
+  static std::map<std::string, double> blockToPosition{
+    {"block_1", -0.15 },
+    {"block_2", 0.0 },
+    {"block_3", 0.15 },
+  };
+
+  const auto it = blockToPosition.find(block);
+
+  CHECK(it != blockToPosition.end(), "");
+
+  return it->second;
+}
 
 void groundTreeInit( const mp::TreeBuilder& tb, KOMO_ext* komo, int verbose )
 {
@@ -71,7 +92,7 @@ void groundTreePutDown(const mp::Interval& it, const mp::TreeBuilder& tb, const 
 
   // approach
   mp::Interval before{{t_switch - 0.4, t_switch - 0.4}, it.edge};
-  if(activateObjectives) W(komo).addObjective( before, tb, new TargetPosition( object, place, ARR( 0.0, 0.0, 0.1 ) ), OT_sos, NoArr, 1e2, 0 ); // coming from above
+  if(activateObjectives) W(komo).addObjective( before, tb, new TargetPosition( object, place, ARR( 0.0, 0.0, 0.1 ) ), OT_sos, NoArr, 0.5e2, 0 ); // coming from above
 
   mp::Interval just_before{{t_switch - 0.2, t_switch}, it.edge};
   if(activateObjectives) W(komo).addObjective( just_before, tb, new AxisAlignment( object, ARR( 0, 0, 1.0 ), ARR( 0, 0, 1.0 ) ), OT_sos, NoArr, 1e2, 0 );
@@ -83,7 +104,7 @@ void groundTreePutDown(const mp::Interval& it, const mp::TreeBuilder& tb, const 
   mp::Interval st{{t_switch, t_switch}, it.edge};
   Transformation rel{0};
   rel.rot.setRadZ( 0.0 );
-  rel.pos.set(0,0, .5*(shapeSize(komo->world, place) + shapeSize(komo->world, object)));
+  rel.pos.set( BlockToPositionX(object, place), 0, .5*(shapeSize(komo->world, place) + shapeSize(komo->world, object)));
   W(komo).addSwitch(st, tb, new KinematicSwitch(SW_effJoint, JT_rigid, place, object, komo->world, SWInit_zero, 0, rel));
 
   if(komo->k_order > 1)
@@ -129,14 +150,18 @@ void groundTreeCheck(const mp::Interval& it, const mp::TreeBuilder& tb, const st
     W(komo).addSwitch(st, tb, new KinematicSwitch(SW_effJoint, JT_rigid, eff, object, komo->world, SWInit_zero, 0, rel));
   }
 
+  mp::Interval during_switches{{t_switch, t_switch_2}, it.edge};
+  arr qmask = ones(7);
+  arr q{9.04785, 3.19438, -0.920429, 2.19381, 0.361943, -2.35801, -2.10368};
+  W(komo).addObjective(during_switches, tb, new mp::AgentKinEquality( 0, q, qmask ), OT_eq, NoArr, 0.5e2, 0 );
+
   if(komo->k_order > 1)
   {
     mp::Interval just_before{{t_switch - 0.1, t_switch}, it.edge};
-    if(activateObjectives) W(komo).addObjective( just_before, tb, new ZeroMovement( object ), OT_eq, NoArr, 1e2, 1 ); // force the object not to move when starting to pick (mainly to force it not to go under the table)
+    if(activateObjectives) W(komo).addObjective( just_before, tb, new ZeroMovement( object ), OT_eq, NoArr, 0.5e2, 1 ); // force the object not to move when starting to pick (mainly to force it not to go under the table)
 
     mp::Interval just_after{{t_switch_2, t_switch_2 + 0.1}, it.edge};
-    if(activateObjectives) W(komo).addObjective( just_after, tb, new ZeroMovement( object ), OT_eq, NoArr, 1e2, 1 ); // force the object not to move when starting to pick (mainly to force it not to go under the table)
-
+    if(activateObjectives) W(komo).addObjective( just_after, tb, new ZeroMovement( object ), OT_eq, NoArr, 0.5e2, 1 ); // force the object not to move when starting to pick (mainly to force it not to go under the table)
   }
 
   if(verbose > 0)
