@@ -125,7 +125,7 @@ void TargetPosition::phi( arr& y, arr& J, const rai::KinematicWorld& G )
 }
 
 
-//-----ZeroRelativeVelocity----------------//
+//-----ZeroVelocity----------------//
 
 void ZeroVelocity::phi( arr& y, arr& J, const rai::KinematicWorld& G )
 {
@@ -145,6 +145,64 @@ void ZeroVelocity::phi( arr& y, arr& J, const rai::KinematicWorld& G )
   y = tmp_y;
   if(&J) J = tmp_J;
 }
+
+//-----ZeroRotation----------------//
+void ZeroRotation::phi( arr& y, arr& J, const rai::KinematicWorld& G )
+{
+  arr tmp_y = zeros( 4 );
+  arr tmp_J = zeros( 4, G.q.N );
+
+  // effector
+  const auto object = G.getFrameByName( objectName_ );
+
+  arr objectQuat, objectJQuat;
+  G.kinematicsQuat( objectQuat, objectJQuat, object );
+
+  tmp_y = objectQuat;
+  tmp_J.setMatrixBlock( objectJQuat, 0, 0 );
+
+  // commit results
+  y = tmp_y;
+  if(&J) J = tmp_J;
+}
+
+//---ZeroMovement------------//
+
+void ZeroMovement::phi( arr& y, arr& J, const WorldL& Gs )
+{
+  CHECK(order==1,"");
+  CHECK(Gs.size() >= 1,"");
+
+  const auto dim_Phi{ dim_phi(*Gs(-1))};
+
+  y.resize(dim_Phi);
+  if(!!J){
+    uintA qidx(Gs.N);
+    qidx(0)=0;
+    for(uint i=1;i<Gs.N;i++) qidx(i) = qidx(i-1)+Gs(i-1)->q.N;
+    J = zeros(y.N, qidx.last()+Gs.last()->q.N);
+  }
+
+  auto frame = Gs(-1)->getFrameByName(objectName_);
+
+  // get pose diff in order 1
+  arr y_vel, J_vel;
+  TM_Default vel(TMT_poseDiff, frame->ID); // to prevent both velocity and orientation changes
+  vel.order = 1;
+  vel.__phi(y_vel, J_vel, Gs);
+
+  y.setVectorBlock( y_vel, 0);
+  if(!!J)
+  {
+    J.setMatrixBlock( J_vel, 0, 0 );
+  }
+}
+
+void ZeroMovement::phi(arr& y, arr& J, const rai::KinematicWorld& G)
+{
+  CHECK(false, "");
+}
+
 
 //-----ZeroRelativeRotationVel----------------//
 
@@ -201,7 +259,6 @@ void ZeroRelativeVel::phi( arr& y, arr& J, const rai::KinematicWorld& G )
 
 //---ZeroVelocityOfAllXYPhiJoints------------//
 
-
 void ZeroVelocityOfAllXYPhiJoints::phi( arr& y, arr& J, const WorldL& Gs )
 {
   CHECK(order==1,"");
@@ -224,7 +281,7 @@ void ZeroVelocityOfAllXYPhiJoints::phi( arr& y, arr& J, const WorldL& Gs )
     {
       // get speed vector
       arr y_vel,Jvel;
-      TM_Default vel(TMT_poseDiff, frame->ID); // to prevent bot velocity and orientation changes
+      TM_Default vel(TMT_poseDiff, frame->ID); // to prevent both velocity and orientation changes
       vel.order = 1;
       vel.__phi(y_vel, Jvel, Gs);
 
