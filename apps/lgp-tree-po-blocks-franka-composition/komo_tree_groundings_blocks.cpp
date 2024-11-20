@@ -1,6 +1,7 @@
 #include <komo_wrapper.h>
 
-#include "komo_tree_groundings.h"
+#include "komo_tree_groundings_blocks.h"
+#include "constants.h"
 
 #include <Kin/switch.h>
 #include <Kin/TM_angVel.h>
@@ -21,6 +22,8 @@ constexpr bool activateObjectives{true};
 
 double shapeSize(const KinematicWorld& K, const char* name, uint i=2);
 
+namespace blocks // refers to subproblem in paper
+{
 double BlockToPositionX(const std::string& block, const std::string& place)
 {
   if(place.find("block") != std::string::npos)
@@ -151,9 +154,7 @@ void groundTreeCheck(const mp::Interval& it, const mp::TreeBuilder& tb, const st
   }
 
   mp::Interval during_switches{{t_switch, t_switch_2}, it.edge};
-  arr qmask = ones(7);
-  arr q{9.04785, 3.19438, -0.920429, 2.19381, 0.361943, -2.35801, -2.10368};
-  W(komo).addObjective(during_switches, tb, new mp::AgentKinEquality( 0, q, qmask ), OT_eq, NoArr, 0.5e2, 0 );
+  W(komo).addObjective(during_switches, tb, new mp::AgentKinEquality( 0, kFrankaCheckConfiguration, kFrankaCheckConfigurationMask ), OT_eq, NoArr, 0.5e2, 0 );
 
   if(komo->k_order > 1)
   {
@@ -173,4 +174,5 @@ void groundTreeCheck(const mp::Interval& it, const mp::TreeBuilder& tb, const st
 void groundTreeStack(const mp::Interval& it, const mp::TreeBuilder& tb, const std::vector<std::string>& facts, KOMO_ext* komo, int verbose)
 {
   groundTreePutDown(it, tb, facts, komo, verbose);
+}
 }

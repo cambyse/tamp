@@ -14,7 +14,9 @@
 #include <observation_tasks.h>
 #include <object_manipulation_tamp_controller.h>
 
-#include "komo_tree_groundings.h"
+#include "komo_tree_groundings_explo.h"
+#include "komo_tree_groundings_blocks.h"
+#include "constants.h"
 
 
 //===========================================================================
@@ -150,18 +152,68 @@ void plan()
 
 
   // register symbols
-  mp.registerInit( groundTreeInit );
-  mp.registerTask( "pick-up"      , groundTreePickUp );
-  mp.registerTask( "put-down"     , groundTreePutDown );
-  mp.registerTask( "check"        , groundTreeCheck );
-  mp.registerTask( "stack"        , groundTreeStack );
-  mp.registerTask( "unstack"      , groundTreeUnStack );
+  mp.registerInit( blocks::groundTreeInit );
+  mp.registerTask( "pick-up"      , blocks::groundTreePickUp );
+  mp.registerTask( "put-down"     , blocks::groundTreePutDown );
+  mp.registerTask( "check"        , blocks::groundTreeCheck );
+  mp.registerTask( "stack"        , blocks::groundTreeStack );
+  mp.registerTask( "unstack"      , blocks::groundTreeUnStack );
 
   // build and run tamp controller
   ObjectManipulationTAMPController tamp(tp, mp);
   TAMPlanningConfiguration config;
   config.watchMarkovianOptimizationResults = true;
   config.watchJointOptimizationResults = true;
+  tamp.plan(config);
+}
+
+void plan_explo()
+{
+  //srand(1);
+
+  // build planner
+  matp::MCTSPlanner tp;
+  mp::KOMOPlanner mp;
+
+  tp.setNumberRollOutPerSimulation( 1 );
+  tp.setVerbose( false );
+
+  mp.setNSteps( 20 );
+  mp.setMinMarkovianCost( 0.00 );
+  mp.setMaxConstraint( 15.0 );
+  mp.addCostIrrelevantTask( "SensorDistanceToObject" );
+  mp.addCostIrrelevantTask( "FixSwichedObjects" );
+  //mp.addCostIrrelevantTask( "AgentKinEquality" );
+
+  // set problem
+  // A
+  {
+    tp.setR0( -50.0, 15.0 ); // -1.0, -10.0
+    tp.setNIterMinMax( 100000, 1000000 );
+    tp.setRollOutMaxSteps( 50 );
+    tp.setFol( "LGP-1-block-6-sides-fol.g" );
+    mp.setKin( "LGP-1-block-6-sides-kin.g", kFrankaCheckConfiguration );
+  }
+
+  // register symbols
+  mp.registerInit( explo::groundTreeInit );
+  mp.registerTask( "pick-up"      , explo::groundTreePickUp );
+  mp.registerTask( "put-down"     , explo::groundTreePutDown );
+  mp.registerTask( "put-down-flipped", explo::groundTreePutDownFlipped );
+  mp.registerTask( "check"        , explo::groundTreeCheck );
+  mp.registerTask( "stack"        , explo::groundTreeStack );
+  mp.registerTask( "unstack"      , explo::groundTreeUnStack );
+
+  // build and run tamp controller
+  ObjectManipulationTAMPController tamp(tp, mp);
+  TAMPlanningConfiguration config;
+  config.watchMarkovianOptimizationResults = true;
+  config.watchJointOptimizationResults = true;
+
+//  std::ofstream params("results/params.data");
+//  params << "c0: " << -1.0 << std::endl;
+//  params.close();
+
   tamp.plan(config);
 }
 
@@ -174,7 +226,8 @@ int main(int argc,char **argv)
 
   rnd.clockSeed();
 
-  plan();
+  //plan();
+  plan_explo();
 
   return 0;
 }
