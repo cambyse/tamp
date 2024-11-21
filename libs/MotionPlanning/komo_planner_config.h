@@ -12,6 +12,8 @@ struct KOMOPlannerConfig
   double maxConstraint_      = 10. * 0.8;
   double minMarkovianCost_   = 0.0;
 
+  bool rejoinStartConfigurationAtPolicyLeaf_{false}; // this is currently used for initialization only!
+
   uint microSteps_           = 20; // per phase
 
   std::launch executionPolicy_ = std::launch::async;
