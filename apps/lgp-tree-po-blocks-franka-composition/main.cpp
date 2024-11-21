@@ -183,7 +183,7 @@ void plan_explo()
   mp.setMaxConstraint( 15.0 );
   mp.addCostIrrelevantTask( "SensorDistanceToObject" );
   mp.addCostIrrelevantTask( "FixSwichedObjects" );
-  //mp.addCostIrrelevantTask( "AgentKinEquality" );
+  mp.setRejoinStartConfigurationAtPolicyLeaf_( true );
 
   // set problem
   // A

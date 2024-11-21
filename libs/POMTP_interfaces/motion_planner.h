@@ -22,7 +22,7 @@ public:
     typedef std::shared_ptr< MotionPlanner > ptr;
 
 public:
-    virtual void setKin( const std::string & kinDescription ) = 0; // specify start kinematics
+    virtual void setKin( const std::string & kinDescription, const arr& q = NoArr ) = 0; // specify start kinematics
     virtual void solveAndInform( const MotionPlanningParameters &, Policy &, bool watchResult = false ) = 0;
     virtual void display( const Policy &, double sec = 30 ) {};
 };

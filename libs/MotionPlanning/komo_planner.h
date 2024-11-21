@@ -23,7 +23,7 @@ public:
   //double getCost(const std::shared_ptr<ExtensibleKOMO> & komo ) const;
 
   // modifiers
-  void setKin( const std::string & kinDescription ) override;
+  void setKin( const std::string & kinDescription, const arr& q = NoArr ) override;
   std::vector< double > drawRandomVector( const std::vector< double > & override = std::vector< double >() );
 
   // informers
@@ -47,6 +47,7 @@ public:
   void setMinMarkovianCost( double m ) { config_.minMarkovianCost_ = m; }
   void setExecutionPolicy(std::launch mode) { config_.executionPolicy_ = mode; }
   void setMaxConstraint( double maxConstraint ) { config_.maxConstraint_ = maxConstraint; }
+  void setRejoinStartConfigurationAtPolicyLeaf_( bool rejoin ) { config_.rejoinStartConfigurationAtPolicyLeaf_ = rejoin; }
   void addCostIrrelevantTask(const rai::String& task_name) { config_.taskIrrelevantForPolicyCost.append(task_name); };
 
   // testonly accessor
