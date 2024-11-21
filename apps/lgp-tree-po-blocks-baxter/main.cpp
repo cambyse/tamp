@@ -428,17 +428,17 @@ void plan_Journal_2024()
   mp.addCostIrrelevantTask( "LimitsConstraint" );
 
   // set start configurations
-//  // D
+  // D
 //  {
-//    tp.setR0( 10.0, 50.0 );
+//    tp.setR0( 0.1, 50.0 );
 //    tp.setNIterMinMax( 1000000, 10000000 ); // 1000000 - by default
 //    tp.setRollOutMaxSteps( 100 );
 //      tp.setFol( "LGP-blocks-fol-one-table-no-precondition.g" );
 //      mp.setKin( "LGP-blocks-kin-one-table.g" );
 //  }
-//  // C
+  // C
 //  {
-//    tp.setR0( -1.0, 15.0 ); // -10.0, -0.1
+//    tp.setR0( -0.1, 15.0 ); // -10.0, -0.1
 //    tp.setNIterMinMax( 100000, 1000000 );
 //    tp.setRollOutMaxSteps( 50 );
 
@@ -448,24 +448,24 @@ void plan_Journal_2024()
 
   // checked, probably doesn't work with n steps = 5
   // B
-  {
-    tp.setR0( -1.0, 15.0 ); // -10.0, -0.1
-    tp.setNIterMinMax( 100000, 1000000 );
-    tp.setRollOutMaxSteps( 50 );
-    tp.setFol( "LGP-blocks-fol-2w-one-table.g" );
-    //tp.setFol( "LGP-blocks-fol-2w-one-table-no-precondition.g" );
-    mp.setKin( "LGP-blocks-kin-2w-one-table.g" );
-  }
-
-  // A
 //  {
 //    tp.setR0( -10.0, 15.0 ); // -10.0, -0.1
-//    tp.setNIterMinMax( 50000, 1000000 );
+//    tp.setNIterMinMax( 100000, 1000000 );
 //    tp.setRollOutMaxSteps( 50 );
-//    tp.setFol( "LGP-blocks-fol-1w-one-table.g" );
-//    //tp.setFol( "LGP-blocks-fol-1w-one-table-no-precondition.g" );
-//    mp.setKin( "LGP-blocks-kin-1w-one-table.g" );
+//    tp.setFol( "LGP-blocks-fol-2w-one-table.g" );
+//    //tp.setFol( "LGP-blocks-fol-2w-one-table-no-precondition.g" );
+//    mp.setKin( "LGP-blocks-kin-2w-one-table.g" );
 //  }
+
+  // A
+  {
+    tp.setR0( -0.1, 15.0 ); // -10.0, -0.1
+    tp.setNIterMinMax( 50000, 1000000 );
+    tp.setRollOutMaxSteps( 50 );
+    tp.setFol( "LGP-blocks-fol-1w-one-table.g" );
+    //tp.setFol( "LGP-blocks-fol-1w-one-table-no-precondition.g" );
+    mp.setKin( "LGP-blocks-kin-1w-one-table.g" );
+  }
 
   // 4 blocks linear
   //tp.setFol( "LGP-blocks-fol-4-blocks-1w-one-table.g" );
@@ -497,8 +497,8 @@ void plan_Journal_2024()
   // build and run tamp controller
   ObjectManipulationTAMPController tamp(tp, mp);
   TAMPlanningConfiguration config;
-  config.watchMarkovianOptimizationResults = true;
-  config.watchJointOptimizationResults = true;
+  config.watchMarkovianOptimizationResults = false;
+  config.watchJointOptimizationResults = false;
   tamp.plan(config);
 }
 

@@ -8,10 +8,6 @@ FOL_World{
 }
 
 ## basic predicates
-#location
-#object
-#mutex_objects	# objects that should never collide
-#container
 block
 location
 table
@@ -48,7 +44,7 @@ START_STATE {
 (table tableC) 
 (location tableC)
 (block block_1) (block block_2) (block block_3)
-(UNEQUAL block_1 block_2) (UNEQUAL block_1 block_3) (UNEQUAL block_2 block_3)
+(UNEQUAL block_1 block_2) (UNEQUAL block_2 block_1) (UNEQUAL block_1 block_3) (UNEQUAL block_3 block_1) (UNEQUAL block_2 block_3) (UNEQUAL block_3 block_2)
 (id block_a) (id block_b) (id block_c)
 (clear block_3) (clear block_2) (clear tableC)
 (on_table block_1 tableC) (on_table block_2 tableC) (on block_3 block_1)
@@ -127,3 +123,4 @@ REWARD {
 
 ### Tasks definitions
 Include = 'LGP-blocks-actions-observations.g'
+Include = 'LGP-blocks-last-block-deduction-3-blocks.g'

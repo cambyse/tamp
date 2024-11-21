@@ -34,7 +34,7 @@ block_4
 block_a  #block identifier
 block_b  #block identifier
 block_c  #block identifier
-block_d
+block_d  #block identifier
 tableC
 
 ## initial state
