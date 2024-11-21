@@ -600,20 +600,18 @@ void KOMOPlanner::optimizeMarkovianPathFrom( const Policy::GraphNodeTypePtr & no
       for(auto s = 0; s < komo->k_order; ++s)
       {
         const auto& kin = parent_path_piece( -int(komo->k_order) + s );
-        //komo->configurations(s)->setJointState(kin.q);
-        komo->configurations(s)->copy(kin);
+        komo->configurations(s)->copy(kin);  //komo->configurations(s)->setJointState(kin.q); (we need to copy here to have the kin switches)
       }
     }
-//    else
-//    {
-//      kin.watch(true);
-//    }
 
-//    if(node->children().empty()) // leaf
-//    {
-//      komo->configurations(-1)->setJointState(startKinematics_( w )->q);
-//      komo->configurations(-2)->setJointState(startKinematics_( w )->q);
-//    }
+    // init the trajectory end with final configuration, when we except rejoin..
+    if(config_.rejoinStartConfigurationAtPolicyLeaf_ && node->children().empty()) // leaf
+    {
+      for(auto s = 1; s <= komo->k_order; ++s)
+      {
+        komo->configurations(-s)->setJointState(startKinematics_( w )->q);
+      }
+    }
 
     // run
     try {
@@ -623,28 +621,21 @@ void KOMOPlanner::optimizeMarkovianPathFrom( const Policy::GraphNodeTypePtr & no
       cout << "KOMO FAILED: " << msg <<endl;
     }
 
-    if( node->id() == 20 )
+    if( node->id() == 2 /*|| node->id() == 2 || node->id() == 3 || node->id() == 4 || node->id() == 5 || node->id() == 6 || node->id() == 7 || node->id() == 8 || node->id() == 9*/ )
     {
-////      int a{0};
-////          for(const auto& f: komo->world.frames)
-////          {
-////            std::cout << f->name << "--->---" << (f->parent ? f->parent->name : "" ) << std::endl;
-////          }
-
 //      komo->getReport(true);
-//      komo->configurations.front()->watch(true);
+////      komo->configurations.front()->watch(true);
 //      komo->configurations.last()->watch(true);
-
 //      komo->displayTrajectory();
 
-//      komo->saveTrajectory( std::to_string( node->id() ) );
-//      komo->plotVelocity( std::to_string( node->id() ) );
-//      rai::wait();
+//      //komo->saveTrajectory( std::to_string( node->id() ) );
+//      //komo->plotVelocity( std::to_string( node->id() ) );
+//      //rai::wait();
     }
 
     const Graph result = komo->getReport();
 
-    std::cout << "result:" << result << std::endl;
+//    std::cout << "result:" << result << std::endl;
 
     const double cost = GetCost(result, config_.taskIrrelevantForPolicyCost);
     const double constraints = GetConstraints(result, config_.taskIrrelevantForPolicyCost);//result.get<double>( { "total", "constraints" } );
@@ -659,10 +650,12 @@ void KOMOPlanner::optimizeMarkovianPathFrom( const Policy::GraphNodeTypePtr & no
     {
       feasible = false;
 
-      //komo->getReport(true);
-      //komo->configurations.first()->watch(true);
-      //komo->configurations.last()->watch(true);
-      //komo->displayTrajectory();
+      std::cout << "result:" << result << std::endl;
+
+//      komo->getReport(true);
+//      komo->configurations.first()->watch(true);
+//      komo->configurations.last()->watch(true);
+//      komo->displayTrajectory();
     }
 
     // update effective kinematic
