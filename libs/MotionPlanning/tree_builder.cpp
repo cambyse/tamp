@@ -498,7 +498,7 @@ arr TreeBuilder::get_scales(const TimeInterval& interval, uint leaf, uint steps)
   const auto& from = it.from;
   const auto& to = it.to;
 
-  // if frm and to are negative, return early
+  // if from and to are negative, return early
   if(from < 0 && to <= 0)
   {
     return arr();
