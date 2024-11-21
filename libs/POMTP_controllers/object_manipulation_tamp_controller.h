@@ -42,11 +42,12 @@ public:
     candidate.open( "results/policy-candidates.data" );
     results.open( "results/policy-results.data" );
     timings.open( "results/timings.data" );
+    percentage_implemented.open( "results/policy-percentage_implemented.data" );
   }
 
   Policy plan( const TAMPlanningConfiguration & ) override;
 
-  std::ofstream candidate, results, timings;
+  std::ofstream candidate, results, timings, percentage_implemented;
 
   double decision_tree_building_s = 0;
   double task_planning_s = 0;

@@ -137,6 +137,7 @@ void MCTSPlanner::buildPolicy()
     PolicyNodeData data;
     data.beliefState = tree_.beliefStates_.at( v->data().beliefState_h );
     data.markovianReturn = rewards_.get( u->id(), v->id() );
+    data.status = data.markovianReturn == rewards_.R0() ? PolicyNodeData::StatusType::UNPLANNED : PolicyNodeData::StatusType::INFORMED;
     data.decisionGraphNodeId = v->id();
     data.leadingKomoArgs = decisionArtifactToKomoArgs( tree_.actions_.at( v->data().leadingAction_h ) );
     if(!u->parents().empty() && !u->parent()->parents().empty())

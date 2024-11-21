@@ -28,6 +28,28 @@ static void savePolicyToFile( const Policy & policy, const std::string & suffix 
   policy.saveToGraphFile( namess.str() );
 }
 
+void traverseAndCountInformedNodes(const Policy::GraphNodeTypePtr& node, uint & n_nodes, uint & n_informed)
+{
+  for( const auto& c : node->children() )
+  {
+    n_nodes++;
+
+    if(c->data().status == PolicyNodeData::StatusType::INFORMED) n_informed++;
+
+    traverseAndCountInformedNodes( c, n_nodes, n_informed );
+  }
+}
+
+double getPercentageOfPolicyInformed(Policy & policy)
+{
+  uint n_nodes{0};
+  uint n_informed{0};
+
+  traverseAndCountInformedNodes(policy.root(), n_nodes, n_informed);
+
+  return double(n_informed) / double(n_nodes) * 100.0;
+}
+
 Policy ObjectManipulationTAMPController::plan( const TAMPlanningConfiguration & config )
 {
   /////////////////////
@@ -44,7 +66,8 @@ Policy ObjectManipulationTAMPController::plan( const TAMPlanningConfiguration & 
 
     const auto elapsed = std::chrono::high_resolution_clock::now() - start;
     decision_tree_building_s+=std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count() / 1000000.0;
-    candidate << policy.id() << "," << std::min( 100.0, -policy.value() ) << std::endl;
+    candidate << policy.id() + 1 << "," << std::min( 100.0, -policy.value() ) << std::endl;
+    percentage_implemented << policy.id() + 1 << ", " << getPercentageOfPolicyInformed(policy) << std::endl;
  }
 
   uint nIt = 0;
@@ -67,7 +90,7 @@ Policy ObjectManipulationTAMPController::plan( const TAMPlanningConfiguration & 
 
       const auto elapsed = std::chrono::high_resolution_clock::now() - start;
       motion_planning_s+=std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count() / 1000000.0;
-      results << policy.id() << "," << std::min( 100.0, -policy.value() ) << std::endl;
+      results << policy.id() + 1 << "," << std::min( 100.0, -policy.value() ) << std::endl;
     }
 
     savePolicyToFile( policy, "-informed" );
@@ -82,7 +105,8 @@ Policy ObjectManipulationTAMPController::plan( const TAMPlanningConfiguration & 
       const auto elapsed = std::chrono::high_resolution_clock::now() - start;
       task_planning_s+=std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count() / 1000000.0;
       policy = tp_.getPolicy();
-      candidate << policy.id() << "," << std::min( 100.0, -policy.value() ) << std::endl;
+      candidate << policy.id() + 1 << "," << std::min( 100.0, -policy.value() ) << std::endl;
+      percentage_implemented << policy.id() + 1 << ", " << getPercentageOfPolicyInformed(policy) << std::endl;
     }
   }
   while( lastPolicy != policy && nIt != maxIt );
