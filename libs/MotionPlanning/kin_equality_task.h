@@ -66,4 +66,50 @@ private:
   const uint dim_;
 };
 
+struct AgentKinBounds:Feature{
+  virtual void phi( arr& y, arr& J, const rai::KinematicWorld& G )
+  {
+    y.resize(dim_phi(G)).setZero();
+
+    const auto& limits=G.getLimits(); //G might change joint ordering (kinematic switches), need to query limits every time
+
+    if(!!J) J.resize(dim_phi(G), G.getJointStateDimension()).setZero();
+
+    for( auto i = 0; i < G.q.N; ++i )
+    {
+      // overflow
+      {
+        const double d = G.q(i) - limits(i, 1);
+        if( d > 0.0 )
+        {
+          y(i) = d;
+          if(!!J) J( i, i ) = 1.0;
+        }
+      }
+
+      // underflow
+      {
+        const double d = - G.q(i) + limits(i, 0);
+        if( d > 0.0 )
+        {
+          y(i) = d;
+          if(!!J) J( i, i ) = -1.0;
+        }
+      }
+    }
+  }
+
+  virtual uint dim_phi( const rai::KinematicWorld& G )
+  {
+    return G.q.N;
+  }
+
+  virtual rai::String shortTag( const rai::KinematicWorld& G )
+  {
+    return rai::String( "AgentKinBounds" );
+  }
+
+private:
+};
+
 }
