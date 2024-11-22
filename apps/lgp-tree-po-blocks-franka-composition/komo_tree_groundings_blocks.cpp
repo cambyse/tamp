@@ -55,8 +55,8 @@ void groundTreePickUp(const mp::Interval& it, const mp::TreeBuilder& tb, const s
 
 void groundTreeUnStack(const mp::Interval& it, const mp::TreeBuilder& tb, const std::vector<std::string>& facts, KOMO_ext* komo, int verbose)
 {
-//  mp::Interval all{{it.time.from, it.time.to - 0.01}, it.edge}; // needs to revise ors to update limits which are not conistent with scaling?
-//  if(activateObjectives)  W(komo).addObjective(all, tb, new mp::AgentKinBounds(), OT_ineq, NoArr, 1.0e2, 0);
+  mp::Interval all{{it.time.from, it.time.to - 0.01}, it.edge}; // needs to revise ors to update limits which are not conistent with scaling?
+  if(activateObjectives)  W(komo).addObjective(all, tb, new mp::AgentKinBounds(), OT_ineq, NoArr, 1.0e2, 0);
 
   const auto& eff = "franka_hand";
   const auto& object = facts[0].c_str();
@@ -91,8 +91,8 @@ void groundTreeUnStack(const mp::Interval& it, const mp::TreeBuilder& tb, const 
 
 void groundTreePutDown(const mp::Interval& it, const mp::TreeBuilder& tb, const std::vector<std::string>& facts, KOMO_ext* komo, int verbose)
 {
-//  mp::Interval all{{it.time.from, it.time.to - 0.01}, it.edge}; // needs to revise ors to update limits which are not conistent with scaling?
-//  if(activateObjectives)  W(komo).addObjective(all, tb, new mp::AgentKinBounds(), OT_ineq, NoArr, 1.0e2, 0);
+  mp::Interval all{{it.time.from, it.time.to - 0.01}, it.edge}; // needs to revise ors to update limits which are not conistent with scaling?
+  if(activateObjectives)  W(komo).addObjective(all, tb, new mp::AgentKinBounds(), OT_ineq, NoArr, 1.0e2, 0);
 
   const auto& object = facts[0].c_str();
   const auto& place = facts[1].c_str();
@@ -103,10 +103,10 @@ void groundTreePutDown(const mp::Interval& it, const mp::TreeBuilder& tb, const 
   mp::Interval before{{t_switch - 0.4, t_switch - 0.4}, it.edge};
   if(activateObjectives) W(komo).addObjective( before, tb, new TargetPosition( object, place, ARR( 0.0, 0.0, 0.1 ) ), OT_sos, NoArr, 0.5e2, 0 ); // coming from above
 
-  mp::Interval just_before{{t_switch - 0.2, t_switch}, it.edge};
-  if(activateObjectives) W(komo).addObjective( just_before, tb, new AxisAlignment( object, ARR( 0, 0, 1.0 ), ARR( 0, 0, 1.0 ) ), OT_sos, NoArr, 1e2, 0 );
+//  mp::Interval just_before{{t_switch - 0.2, t_switch - 0.01}, it.edge};
+//  if(activateObjectives) W(komo).addObjective( just_before, tb, new AxisAlignment( object, ARR( 0, 0, 1.0 ), ARR( 0, 0, 1.0 ) ), OT_sos, NoArr, 1e2, 0 );
 
-//  mp::Interval end{{t_switch - 0.2, t_switch}, it.edge};
+//  mp::Interval end{{t_switch - 0.2, t_switch - 0.01}, it.edge};
 //  if(activateObjectives) W(komo).addObjective(end, tb, new TM_AboveBox(komo->world, object, place), OT_ineq, NoArr, 1e1, 0);
 
   // switch
@@ -118,7 +118,7 @@ void groundTreePutDown(const mp::Interval& it, const mp::TreeBuilder& tb, const 
 
   if(komo->k_order > 1)
   {
-    mp::Interval just_before{{t_switch - 0.2, t_switch}, it.edge};
+    mp::Interval just_before{{t_switch - 0.2, t_switch - 0.01}, it.edge};
     if(activateObjectives) W(komo).addObjective( just_before, tb, new ZeroMovement( object ), OT_eq, NoArr, 1e2, 1 ); // force the object not to move when starting to pick (mainly to force it not to go under the table)
   }
 
@@ -130,9 +130,9 @@ void groundTreePutDown(const mp::Interval& it, const mp::TreeBuilder& tb, const 
 
 void groundTreeCheck(const mp::Interval& it, const mp::TreeBuilder& tb, const std::vector<std::string>& facts, KOMO_ext* komo, int verbose)
 {
-//  mp::Interval all{{it.time.from, it.time.to - 0.01}, it.edge}; // needs to revise ors to update limits which are not conistent with scaling?
-//  if(activateObjectives)  W(komo).addObjective(all, tb, new mp::AgentKinBounds(), OT_ineq, NoArr, 1.0e2, 0);
-//
+  mp::Interval all{{it.time.from, it.time.to - 0.01}, it.edge}; // needs to revise ors to update limits which are not conistent with scaling?
+  if(activateObjectives)  W(komo).addObjective(all, tb, new mp::AgentKinBounds(), OT_ineq, NoArr, 1.0e2, 0);
+  //
 
   const auto& object = facts[0].c_str();
   const auto& place = facts[1].c_str();

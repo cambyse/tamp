@@ -18,6 +18,7 @@
 #include "komo_tree_groundings_blocks.h"
 #include "constants.h"
 
+#include <utility.h>
 
 //===========================================================================
 
@@ -78,7 +79,7 @@ void display_robot()
 //    rai::wait( 300, true );
 }
 
-void plan()
+void plan(const double c0)
 {
   // debug mp
 //  {
@@ -121,9 +122,6 @@ void plan()
   matp::MCTSPlanner tp;
   mp::KOMOPlanner mp;
 
-  tp.setR0( -1.0, 5.0 );
-  tp.setNIterMinMax( 500000, 1000000 );
-  tp.setRollOutMaxSteps( 100 );
   tp.setNumberRollOutPerSimulation( 1 );
   tp.setVerbose( false );
 
@@ -134,7 +132,7 @@ void plan()
 
   // set problem 3 blocks
   {
-    tp.setR0( -10.0, 15.0 ); // -10.0, -0.1
+    tp.setR0( -c0, 15.0 ); // -10.0
     tp.setNIterMinMax( 100000, 1000000 );
     tp.setRollOutMaxSteps( 50 );
     tp.setFol( "LGP-3-blocks-1-side-fol.g" );
@@ -162,12 +160,12 @@ void plan()
   // build and run tamp controller
   ObjectManipulationTAMPController tamp(tp, mp);
   TAMPlanningConfiguration config;
-  config.watchMarkovianOptimizationResults = true;
-  config.watchJointOptimizationResults = true;
+  config.watchMarkovianOptimizationResults = false;
+  config.watchJointOptimizationResults = false;
   tamp.plan(config);
 }
 
-void plan_explo()
+void plan_explo(const double c0)
 {
   //srand(1);
 
@@ -188,7 +186,7 @@ void plan_explo()
   // set problem
   // A
   {
-    tp.setR0( -50.0, 15.0 ); // -1.0, -10.0
+    tp.setR0( -c0, 15.0 ); // -1.0, -10.0
     tp.setNIterMinMax( 100000, 1000000 );
     tp.setRollOutMaxSteps( 50 );
     tp.setFol( "LGP-1-block-6-sides-fol.g" );
@@ -207,8 +205,8 @@ void plan_explo()
   // build and run tamp controller
   ObjectManipulationTAMPController tamp(tp, mp);
   TAMPlanningConfiguration config;
-  config.watchMarkovianOptimizationResults = true;
-  config.watchJointOptimizationResults = true;
+  config.watchMarkovianOptimizationResults = false;
+  config.watchJointOptimizationResults = false;
 
 //  std::ofstream params("results/params.data");
 //  params << "c0: " << -1.0 << std::endl;
@@ -223,11 +221,27 @@ void plan_explo()
 int main(int argc,char **argv)
 {
   rai::initCmdLine(argc,argv);
+  auto args = parseArguments(argc, argv);
 
   rnd.clockSeed();
 
-  //plan();
-  plan_explo();
+  for (const auto& [key, value] : args)
+  {
+     std::cout << key << ": " << value << std::endl;
+  }
+
+  const auto pb = value_or(args, "-pb", "blocks");
+  const double c0 = std::stof(value_or(args, "-c0", "5.0"));
+
+  if(pb == "blocks")
+  {
+    plan(c0);
+  }
+
+  if(pb == "explo")
+  {
+    plan_explo(c0);
+  }
 
   return 0;
 }

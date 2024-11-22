@@ -35,19 +35,19 @@ block_a  #block identifier
 block_b  #block identifier
 block_c  #block identifier
 block_d  #block identifier
-tableC
+tableR
 
 ## initial state
 START_STATE { 
-(table tableC) 
-(location tableC)
+(table tableR) 
+(location tableR)
 (block block_1) (block block_2) (block block_3) (block block_4)
 (id block_a) (id block_b) (id block_c) (id block_d)
 (UNEQUAL block_1 block_2) (UNEQUAL block_1 block_3) (UNEQUAL block_1 block_4)
 (UNEQUAL block_2 block_3) (UNEQUAL block_2 block_4)
 (UNEQUAL block_3 block_4)
-(clear block_3) (clear block_4) (clear tableC)
-(on_table block_1 tableC) (on_table block_2 tableC) (on block_3 block_1) (on block_4 block_2)
+(clear block_3) (clear block_4) (clear tableR)
+(on_table block_1 tableR) (on_table block_2 tableR) (on block_3 block_1) (on block_4 block_2)
 (hand_empty) 
 }
 

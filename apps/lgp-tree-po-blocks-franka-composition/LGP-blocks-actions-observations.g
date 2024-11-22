@@ -1,8 +1,8 @@
 # Check
 DecisionRule check {
-  X
-  { (block X) (holding X)! (identified X)! (hand_empty) }
-  { (in_sight X) komoCheck(X)=1. }
+  X, Y
+  { (block X) (holding X) (identified X)! (observation_location Y)}
+  { (in_sight X) komoCheck(X Y)=1. }
 }
 
 # Pick-up
