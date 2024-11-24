@@ -32,9 +32,9 @@ double BlockToPositionX(const std::string& block, const std::string& place)
   }
 
   static std::map<std::string, double> blockToPosition{
-    {"block_1", -0.15 },
-    {"block_2", 0.0 },
-    {"block_3", 0.15 },
+    {"block_1", -0.2 },
+    {"block_2", 0.2 },
+    {"block_3", 0.0 },
   };
 
   const auto it = blockToPosition.find(block);

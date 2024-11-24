@@ -34,14 +34,14 @@ void ComposedPolicyVisualizer::visualizeComposedPolicy(
   const auto framesHigh = createFramesFor(startKinematicsHigh(0), policyHigh, XHigh, komoFactoryHigh, 4);
   const auto framesHigh_1 = createFramesFor(startKinematicsHigh(1), policyHigh, XHigh, komoFactoryHigh, 4); // blue (side 5)
   const auto framesHigh_2 = createFramesFor(startKinematicsHigh(2), policyHigh, XHigh, komoFactoryHigh, 4); // red  (side 0)
-  const auto framesHigh_3 = createFramesFor(startKinematicsHigh(3), policyHigh, XHigh, komoFactoryHigh, 4); // green (side 2)
+  const auto framesHigh_3 = createFramesFor(startKinematicsHigh(3), policyHigh, XHigh, komoFactoryHigh, 4); // green (side 3)
 
   //const_cast<rai::KinematicWorld*>(startKinematicsHigh(0)(0).get())->watch(true);
   //const_cast<rai::KinematicWorld*>(startKinematicsHigh(1)(0).get())->watch(true);
 
   const auto framesLow = createFramesFor(startKinematicsLow(0), policyLow, XLow, komoFactoryLow, 5);   // blue
   const auto framesLow_1 = createFramesFor(startKinematicsLow(1), policyLow, XLow, komoFactoryLow, 0); // red
-  const auto framesLow_2 = createFramesFor(startKinematicsLow(2), policyLow, XLow, komoFactoryLow, 2); // green
+  const auto framesLow_2 = createFramesFor(startKinematicsLow(2), policyLow, XLow, komoFactoryLow, 3); // green
 
   rai::Array< rai::KinematicWorld > framesConcatenated;
 
