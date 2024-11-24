@@ -8,14 +8,16 @@
 #include <graph_planner.h>
 #include <mcts_planner.h>
 #include <mcts_planner_bs.h>
-
+#include <komo_sparse_planner.h>
 #include <komo_planner.h>
+
 #include <approx_shape_to_sphere.h>
 #include <observation_tasks.h>
 #include <object_manipulation_tamp_controller.h>
 
 #include "komo_tree_groundings_explo.h"
 #include "komo_tree_groundings_blocks.h"
+#include "composed_policy_visualizer.h"
 #include "constants.h"
 
 #include <utility.h>
@@ -51,33 +53,7 @@ static void savePolicyToFile( const Policy & policy, const std::string & suffix 
 
 //===========================================================================
 
-void display_robot()
-{
-    rai::KinematicWorld kin;
 
-    kin.init( "LGP-1-block-6-sides-kin.g" );
-    //kin.setJointState({0.0, 3.0, 0.0, 0.65, 0.0, -1.0, -0.78});
-
-    std::cout << "q:" << kin.q << std::endl;
-
-//    kin.init( "LGP-blocks-kin-unified-b6.g" );
-
-////    const double zf = 1.47;
-////    const double s = 0.55;
-////    kin.gl().camera.setPosition(s * 10., s * 4.5, zf + s * ( 3.5 - zf ));
-
-//    const double zf = 1.0;
-//    const double s = 0.35;
-//    kin.gl().camera.setPosition(s * 10., s * 0, zf + s * ( 1.5 - zf ));
-
-//    kin.gl().camera.focus(0.5, 0, zf);
-//    kin.gl().camera.upright();
-
-    kin.watch(100);
-//    kin.write( std::cout );
-
-//    rai::wait( 300, true );
-}
 
 void plan(const double c0)
 {
@@ -129,7 +105,7 @@ void plan(const double c0)
   mp.setMinMarkovianCost( 0.00 );
   mp.setMaxConstraint( 15.0 );
   mp.addCostIrrelevantTask( "FixSwichedObjects" );
-
+  mp.saveXVariable(true);
   // set problem 3 blocks
   {
     tp.setR0( -c0, 15.0 ); // -10.0
@@ -161,7 +137,7 @@ void plan(const double c0)
   ObjectManipulationTAMPController tamp(tp, mp);
   TAMPlanningConfiguration config;
   config.watchMarkovianOptimizationResults = false;
-  config.watchJointOptimizationResults = false;
+  config.watchJointOptimizationResults = true;
   tamp.plan(config);
 }
 
@@ -182,7 +158,7 @@ void plan_explo(const double c0)
   mp.addCostIrrelevantTask( "SensorDistanceToObject" );
   mp.addCostIrrelevantTask( "FixSwichedObjects" );
   mp.setRejoinStartConfigurationAtPolicyLeaf_( true );
-
+  mp.saveXVariable(true);
   // set problem
   // A
   {
@@ -207,7 +183,6 @@ void plan_explo(const double c0)
   TAMPlanningConfiguration config;
   config.watchMarkovianOptimizationResults = false;
   config.watchJointOptimizationResults = false;
-
 //  std::ofstream params("results/params.data");
 //  params << "c0: " << -1.0 << std::endl;
 //  params.close();
@@ -241,6 +216,88 @@ int main(int argc,char **argv)
   if(pb == "explo")
   {
     plan_explo(c0);
+  }
+
+  if(pb == "both")
+  {
+    plan_explo(c0);
+    plan(c0);
+  }
+
+  if(pb == "play")
+  {
+    XVariable XHigh;
+    XHigh.load("composition/xvariable-high");
+
+    Policy policyHigh;
+    policyHigh.load("composition/policy-high");
+
+    XVariable Xlow;
+    Xlow.load("composition/xvariable-low");
+
+    Policy policyLow;
+    policyLow.load("composition/policy-low");
+
+    // create worlds for high, and their variations..
+    rai::Array< rai::Array< std::shared_ptr< const rai::KinematicWorld > > > startKinematicsHigh;
+    mp::KOMOPlanner mpHigh;
+    mpHigh.setKin("composition/LGP-3-blocks-1-side-kin.g");
+    startKinematicsHigh.append(mpHigh.startKinematics());
+    {
+      mp::KOMOPlanner mp;
+      mp.setKin("composition/LGP-3-blocks-1-side-kin_1.g");
+      startKinematicsHigh.append(mp.startKinematics());
+    }
+    {
+      mp::KOMOPlanner mp;
+      mp.setKin("composition/LGP-3-blocks-1-side-kin_2.g");
+      startKinematicsHigh.append(mp.startKinematics());
+    }
+    {
+      mp::KOMOPlanner mp;
+      mp.setKin("composition/LGP-3-blocks-1-side-kin_3.g");
+      startKinematicsHigh.append(mp.startKinematics());
+    }
+
+    rai::Array< rai::Array< std::shared_ptr< const rai::KinematicWorld > > > startKinematicsLow;
+    mp::KOMOPlanner mpLow;
+    mpLow.setKin("composition/LGP-1-block-6-sides-kin.g");
+    startKinematicsLow.append(mpLow.startKinematics());
+    {
+      mp::KOMOPlanner mp;
+      mp.setKin("composition/LGP-1-block-6-sides-kin_1.g");
+      startKinematicsLow.append(mp.startKinematics());
+    }
+    {
+      mp::KOMOPlanner mp;
+      mp.setKin("composition/LGP-1-block-6-sides-kin_2.g");
+      startKinematicsLow.append(mp.startKinematics());
+    }
+
+    // register symbols high
+    mpHigh.registerInit( blocks::groundTreeInit );
+    mpHigh.registerTask( "pick-up"      , blocks::groundTreePickUp );
+    mpHigh.registerTask( "put-down"     , blocks::groundTreePutDown );
+    mpHigh.registerTask( "check"        , blocks::groundTreeCheck );
+    mpHigh.registerTask( "stack"        , blocks::groundTreeStack );
+    mpHigh.registerTask( "unstack"      , blocks::groundTreeUnStack );
+
+    // register symbols Low
+    mpLow.registerInit( explo::groundTreeInit );
+    mpLow.registerTask( "pick-up"      , explo::groundTreePickUp );
+    mpLow.registerTask( "put-down"     , explo::groundTreePutDown );
+    mpLow.registerTask( "put-down-flipped", explo::groundTreePutDownFlipped );
+    mpLow.registerTask( "check"        , explo::groundTreeCheck );
+    mpLow.registerTask( "stack"        , explo::groundTreeStack );
+    mpLow.registerTask( "unstack"      , explo::groundTreeUnStack );
+
+
+    mp::ComposedPolicyVisualizer visualizer{{}, {}};
+    visualizer.visualizeComposedPolicy(startKinematicsHigh, startKinematicsLow,
+                                       policyHigh, policyLow,
+                                       XHigh, Xlow,
+                                       mpHigh.komoFactory(),
+                                       mpLow.komoFactory());
   }
 
   return 0;
