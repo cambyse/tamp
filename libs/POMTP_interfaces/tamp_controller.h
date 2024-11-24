@@ -27,7 +27,6 @@ struct TAMPlanningConfiguration
 
   bool watchMarkovianOptimizationResults{false};
   bool watchJointOptimizationResults{false};
-
 };
 
 class TAMPController
