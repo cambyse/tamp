@@ -80,58 +80,6 @@ static double GetConstraints(const Graph& result, const StringA& filtered_tasks)
 
 //--------Motion Planner--------------//
 
-//double KOMOPlanner::getCost(const std::shared_ptr<ExtensibleKOMO> & komo ) const
-//{
-//  double total_cost{0.0};
-
-//  for(uint i=0; i<komo->objectives.N; i++)
-//  {
-//    Objective *task = komo->objectives(i);
-//    WorldL Ktuple;
-//    Ktuple.resize(task->map->order + 1);
-
-//    if(isTaskIrrelevant(task->name, config_.taskIrrelevantForPolicyCost))
-//    {
-//       continue;
-//    }
-
-//    double task_cost{0.0};
-
-//    for(uint t=0;t < std::min(task->vars.d0, komo->configurations.d0 - task->map->order - 1);t++)
-//    {
-//      for(uint s=0; s < task->map->order + 1; ++s)
-//      {
-//        const auto global = t + s;
-
-//        CHECK(global >= 0 && global < komo->configurations.d0, "");
-
-//        Ktuple(s) = komo->configurations(global);
-//      }
-
-//      uint d=task->map->__dim_phi(Ktuple);
-//      arr y;
-//      arr J;
-//      task->map->__phi(y, J, Ktuple);
-//      CHECK(y.d0 == d, "wrong tm dimensionality");
-
-//      const double global_scale = task->map->scale.N ? task->map->scale(0) : 1.0;
-//      const double scale = task->scales.d0 ? task->scales(t) * global_scale : global_scale;
-
-//      if(task->type==OT_sos)
-//      {
-//        task_cost += scale * sumOfSqr(y);
-//      }
-//    }
-
-//    std::cout << task->name << " : " << task_cost << std::endl;
-
-//    total_cost += task_cost;
-//  }
-
-//  std::cout << "total_cost : " << total_cost << std::endl;
-
-//  return total_cost;
-//}
 
 void KOMOPlanner::setKin( const std::string & kinDescription, const arr& q )
 {
@@ -657,6 +605,16 @@ void KOMOPlanner::optimizeMarkovianPathFrom( const Policy::GraphNodeTypePtr & no
 //      komo->configurations.last()->watch(true);
 //      komo->displayTrajectory();
     }
+
+//    if( cost >= 300.0 )
+//    {
+//      std::cout << "result:" << result << std::endl;
+
+//      komo->getReport(true);
+////      komo->configurations.first()->watch(true);
+////      komo->configurations.last()->watch(true);
+//      komo->displayTrajectory();
+//    }
 
     // update effective kinematic
     effMarkovianPathKinematics_[ node->data().decisionGraphNodeId ] = *komo->configurations.last();

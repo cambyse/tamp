@@ -49,6 +49,7 @@ public:
   void setMaxConstraint( double maxConstraint ) { config_.maxConstraint_ = maxConstraint; }
   void setRejoinStartConfigurationAtPolicyLeaf_( bool rejoin ) { config_.rejoinStartConfigurationAtPolicyLeaf_ = rejoin; }
   void addCostIrrelevantTask(const rai::String& task_name) { config_.taskIrrelevantForPolicyCost.append(task_name); };
+  void saveXVariable(bool save) { config_.saveXVariable = save; }
 
   // testonly accessor
   const KOMOPlannerConfig& config() const { return config_; }
