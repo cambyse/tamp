@@ -229,10 +229,86 @@ bool operator!= ( const Policy & a, const Policy & b );
 
 std::list< Policy::GraphNodeTypePtr > getPathTo( const Policy::GraphNodeTypePtr & node );
 
+
 struct PolicyHasher
 {
   std::size_t operator()( const Policy & s ) const noexcept
   {
     return s.hash();
+  }
+};
+
+
+//template<class Archive, class T>
+//void load(Archive & ar, rai::Array<T> & obj, const unsigned int version) {
+//      ar & boost::serialization::base_object<std::vector<T>>(obj);
+//      ar & obj.N;
+////      ar & obj.nd;
+//      ar & obj.d0;
+////      ar & obj.d1;
+////      ar & obj.d2;
+////      ar & obj.M;
+////      ar & obj.reference;
+//////      T *p;     ///< the pointer on the linear memory allocated
+//////      uint N;   ///< number of elements
+//////      uint nd;  ///< number of dimensions
+//////      uint d0,d1,d2;  ///< 0th, 1st, 2nd dim
+//////      uint *d;  ///< pointer to dimensions (for nd<=3 points to d0)
+//////      uint M;   ///< size of actually allocated memory (may be greater than N)
+//////      bool reference; ///< true if this refers to some external memory
+////     obj.p = obj.data();
+//}
+
+//template<class Archive, class T>
+//void save(Archive & ar, rai::Array<T> & obj, const unsigned int version) {
+//      ar & boost::serialization::base_object<std::vector<T>>(obj);
+//      ar & obj.N;
+////      ar & obj.nd;
+//      ar & obj.d0;
+////      ar & obj.d1;
+////      ar & obj.d2;
+////      ar & obj.M;
+////      ar & obj.reference;
+//}
+
+// Split serialization into save and load
+template<class Archive, class T>
+void serialize(Archive& ar, rai::Array<T>& obj, const unsigned int version) {
+    //boost::serialization::split_free(ar, obj, version);
+    ar & boost::serialization::base_object<std::vector<T>>(obj);
+    ar & obj.N;
+    ar & obj.nd;
+    ar & obj.d0;
+    ar & obj.d1;
+    ar & obj.d2;
+    ar & obj.M;
+    ar & obj.reference;
+}
+
+
+// Structure to exchange the variable X
+struct XVariable
+{
+  arr x;
+  intA stepToQDim; // global step to qdim
+  intA stepTointegratedQDim;
+
+  uint GetGlobalIndex(const uint global_step) const
+  {
+    CHECK(global_step < stepToQDim.d0, "corrupted dimensions");
+    CHECK(global_step < stepTointegratedQDim.d0, "corrupted dimensions");
+    return stepTointegratedQDim(global_step) - stepToQDim(global_step);
+  };
+
+  void save( const std::string & file ) const;
+  void load( const std::string & file );
+
+  friend class boost::serialization::access;
+  template<class Archive>
+  void serialize(Archive & ar, const unsigned int version)
+  {
+    ar & x;
+    ar & stepToQDim;
+    ar & stepTointegratedQDim;
   }
 };

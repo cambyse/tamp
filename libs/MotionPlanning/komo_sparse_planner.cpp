@@ -77,8 +77,8 @@ std::vector<intA> KOMOSparsePlanner::getSubProblemMasks( const std::vector<Vars>
 }
 
 void KOMOSparsePlanner::groundPolicyActionsJoint( const TreeBuilder & tree,
-                               Policy & policy,
-                               const std::shared_ptr< ExtensibleKOMO > & komo ) const
+                                                  const Policy & policy,
+                                                  const std::shared_ptr< ExtensibleKOMO > & komo ) const
 {
   // traverse tree and ground symbols
   std::unordered_set<uint> visited;
@@ -664,6 +664,14 @@ void ADMMCompressedPlanner::optimize( Policy & policy, const rai::Array< std::sh
 
   XVariable Y{X_};
   Y.x = x;
+
+  if(config_.saveXVariable)
+  {
+    std::stringstream ss;
+    ss << "results/xvariable-joint-" << policy.id();
+    Y.save(ss.str());
+  }
+
   EvaluationPlanner(config_,
                     komoFactory_,
                     Y,
@@ -701,4 +709,5 @@ void EvaluationPlanner::optimize( Policy & policy, const rai::Array< std::shared
 
   if(watchResult) watch( startKinematics, komo->switches, policy, tree, X_, komo->stepsPerPhase, komo->k_order );
 }
+
 }

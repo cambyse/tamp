@@ -28,7 +28,7 @@ public:
   std::vector<Vars> getSubProblems( const TreeBuilder & tree, Policy & policy ) const; // deprecated (branch gen)
   std::vector<intA> getSubProblemMasks( const std::vector<Vars> & allVars, uint T ) const;
   void groundPolicyActionsJoint( const TreeBuilder & tree,
-                                 Policy & policy,
+                                 const Policy & policy,
                                  const std::shared_ptr< ExtensibleKOMO > & komo ) const;
   void watch( const std::shared_ptr< ExtensibleKOMO > & komo ) const;
   void watch( const std::shared_ptr< ExtensibleKOMO > & komo, const TreeBuilder & tree ) const; // watch using only the witness komo -> inconsistent for visualization

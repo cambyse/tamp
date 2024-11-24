@@ -19,4 +19,6 @@ struct KOMOPlannerConfig
   std::launch executionPolicy_ = std::launch::async;
 
   StringA taskIrrelevantForPolicyCost {};
+
+  bool saveXVariable{false};
 };

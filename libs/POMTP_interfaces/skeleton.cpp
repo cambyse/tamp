@@ -302,3 +302,21 @@ std::list< Policy::GraphNodeTypePtr > getPathTo( const Policy::GraphNodeTypePtr 
 
   return path;
 }
+
+void XVariable::save( const std::string & file ) const
+{
+  std::ofstream ofs( file );
+  boost::archive::text_oarchive oa(ofs);
+  oa << *this;
+}
+
+void XVariable::load( const std::string & file )
+{
+  std::ifstream ifs( file );
+  boost::archive::text_iarchive ia(ifs);
+  ia >> *this;
+
+  x.p = x.data();
+  stepToQDim.p = stepToQDim.data();
+  stepTointegratedQDim.p = stepTointegratedQDim.data();
+}
