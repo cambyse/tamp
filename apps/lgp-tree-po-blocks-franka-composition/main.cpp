@@ -190,6 +190,88 @@ void plan_explo(const double c0)
   tamp.plan(config);
 }
 
+void play()
+{
+  XVariable XHigh;
+  XHigh.load("composition/xvariable-high");
+
+  Policy policyHigh;
+  policyHigh.load("composition/policy-high");
+
+  XVariable Xlow;
+  Xlow.load("composition/xvariable-low");
+
+  Policy policyLow;
+  policyLow.load("composition/policy-low");
+
+  // create worlds for high, and their variations..
+  rai::Array< rai::Array< std::shared_ptr< const rai::KinematicWorld > > > startKinematicsHigh;
+  mp::KOMOPlanner mpHigh;
+  mpHigh.setKin("composition/LGP-3-blocks-1-side-kin.g");
+  startKinematicsHigh.append(mpHigh.startKinematics());
+  {
+    mp::KOMOPlanner mp;
+    mp.setKin("composition/LGP-3-blocks-1-side-kin_1.g");
+    startKinematicsHigh.append(mp.startKinematics());
+  }
+  {
+    mp::KOMOPlanner mp;
+    mp.setKin("composition/LGP-3-blocks-1-side-kin_2.g");
+    startKinematicsHigh.append(mp.startKinematics());
+  }
+  {
+    mp::KOMOPlanner mp;
+    mp.setKin("composition/LGP-3-blocks-1-side-kin_3.g");
+    startKinematicsHigh.append(mp.startKinematics());
+  }
+
+  rai::Array< rai::Array< std::shared_ptr< const rai::KinematicWorld > > > startKinematicsLow;
+  mp::KOMOPlanner mpLow;
+  mpLow.setKin("composition/LGP-1-block-6-sides-kin.g");
+  startKinematicsLow.append(mpLow.startKinematics());
+  {
+    mp::KOMOPlanner mp;
+    mp.setKin("composition/LGP-1-block-6-sides-kin_1.g");
+    startKinematicsLow.append(mp.startKinematics());
+  }
+  {
+    mp::KOMOPlanner mp;
+    mp.setKin("composition/LGP-1-block-6-sides-kin_2.g");
+    startKinematicsLow.append(mp.startKinematics());
+  }
+
+  // register symbols high
+  mpHigh.registerInit( blocks::groundTreeInit );
+  mpHigh.registerTask( "pick-up"      , blocks::groundTreePickUp );
+  mpHigh.registerTask( "put-down"     , blocks::groundTreePutDown );
+  mpHigh.registerTask( "check"        , blocks::groundTreeCheck );
+  mpHigh.registerTask( "stack"        , blocks::groundTreeStack );
+  mpHigh.registerTask( "unstack"      , blocks::groundTreeUnStack );
+
+  // register symbols Low
+  mpLow.registerInit( explo::groundTreeInit );
+  mpLow.registerTask( "pick-up"      , explo::groundTreePickUp );
+  mpLow.registerTask( "put-down"     , explo::groundTreePutDown );
+  mpLow.registerTask( "put-down-flipped", explo::groundTreePutDownFlipped );
+  mpLow.registerTask( "check"        , explo::groundTreeCheck );
+  mpLow.registerTask( "stack"        , explo::groundTreeStack );
+  mpLow.registerTask( "unstack"      , explo::groundTreeUnStack );
+
+
+  mp::ComposedPolicyVisualizer visualizer{{}, {}};
+  visualizer.visualizeComposedPolicy(startKinematicsHigh, startKinematicsLow,
+                                     policyHigh, policyLow,
+                                     XHigh, Xlow,
+                                     mpHigh.komoFactory(),
+                                     mpLow.komoFactory());
+}
+
+void show()
+{
+  mp::KOMOPlanner mp;
+  mp.setKin("composition/LGP-3-blocks-1-side-kin.g");
+  const_cast<rai::KinematicWorld*>(mp.startKinematics()(4).get())->watch(true);
+}
 
 //===========================================================================
 
@@ -226,78 +308,12 @@ int main(int argc,char **argv)
 
   if(pb == "play")
   {
-    XVariable XHigh;
-    XHigh.load("composition/xvariable-high");
+    play();
+  }
 
-    Policy policyHigh;
-    policyHigh.load("composition/policy-high");
-
-    XVariable Xlow;
-    Xlow.load("composition/xvariable-low");
-
-    Policy policyLow;
-    policyLow.load("composition/policy-low");
-
-    // create worlds for high, and their variations..
-    rai::Array< rai::Array< std::shared_ptr< const rai::KinematicWorld > > > startKinematicsHigh;
-    mp::KOMOPlanner mpHigh;
-    mpHigh.setKin("composition/LGP-3-blocks-1-side-kin.g");
-    startKinematicsHigh.append(mpHigh.startKinematics());
-    {
-      mp::KOMOPlanner mp;
-      mp.setKin("composition/LGP-3-blocks-1-side-kin_1.g");
-      startKinematicsHigh.append(mp.startKinematics());
-    }
-    {
-      mp::KOMOPlanner mp;
-      mp.setKin("composition/LGP-3-blocks-1-side-kin_2.g");
-      startKinematicsHigh.append(mp.startKinematics());
-    }
-    {
-      mp::KOMOPlanner mp;
-      mp.setKin("composition/LGP-3-blocks-1-side-kin_3.g");
-      startKinematicsHigh.append(mp.startKinematics());
-    }
-
-    rai::Array< rai::Array< std::shared_ptr< const rai::KinematicWorld > > > startKinematicsLow;
-    mp::KOMOPlanner mpLow;
-    mpLow.setKin("composition/LGP-1-block-6-sides-kin.g");
-    startKinematicsLow.append(mpLow.startKinematics());
-    {
-      mp::KOMOPlanner mp;
-      mp.setKin("composition/LGP-1-block-6-sides-kin_1.g");
-      startKinematicsLow.append(mp.startKinematics());
-    }
-    {
-      mp::KOMOPlanner mp;
-      mp.setKin("composition/LGP-1-block-6-sides-kin_2.g");
-      startKinematicsLow.append(mp.startKinematics());
-    }
-
-    // register symbols high
-    mpHigh.registerInit( blocks::groundTreeInit );
-    mpHigh.registerTask( "pick-up"      , blocks::groundTreePickUp );
-    mpHigh.registerTask( "put-down"     , blocks::groundTreePutDown );
-    mpHigh.registerTask( "check"        , blocks::groundTreeCheck );
-    mpHigh.registerTask( "stack"        , blocks::groundTreeStack );
-    mpHigh.registerTask( "unstack"      , blocks::groundTreeUnStack );
-
-    // register symbols Low
-    mpLow.registerInit( explo::groundTreeInit );
-    mpLow.registerTask( "pick-up"      , explo::groundTreePickUp );
-    mpLow.registerTask( "put-down"     , explo::groundTreePutDown );
-    mpLow.registerTask( "put-down-flipped", explo::groundTreePutDownFlipped );
-    mpLow.registerTask( "check"        , explo::groundTreeCheck );
-    mpLow.registerTask( "stack"        , explo::groundTreeStack );
-    mpLow.registerTask( "unstack"      , explo::groundTreeUnStack );
-
-
-    mp::ComposedPolicyVisualizer visualizer{{}, {}};
-    visualizer.visualizeComposedPolicy(startKinematicsHigh, startKinematicsLow,
-                                       policyHigh, policyLow,
-                                       XHigh, Xlow,
-                                       mpHigh.komoFactory(),
-                                       mpLow.komoFactory());
+  if(pb == "show")
+  {
+    show();
   }
 
   return 0;

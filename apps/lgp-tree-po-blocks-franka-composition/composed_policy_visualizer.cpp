@@ -76,6 +76,25 @@ void ComposedPolicyVisualizer::visualizeComposedPolicy(
   framesAll(0).resize(1);
   framesAll(0)(0) = framesConcatenated;
 
+
+  /// debug for keyframes
+//  for(auto i = 0; i < framesConcatenated.d0 / 20; ++i)
+//  {
+//    auto& kin = (framesAll(0)(0)(20 * i));
+//    auto& camera = kin.gl().camera;
+//    double s{0.35};
+//    kin.gl().camera.setPosition((8 + 3.75) * s, 12 * s, (6 - 0.3) * s);
+//    kin.gl().camera.focus(0, 0, 0.5);
+//    kin.watch(true);
+//  }
+
+//  auto& kin = (framesAll(0)(0)(-1));
+//  auto& camera = kin.gl().camera;
+//  double s{0.35};
+//  kin.gl().camera.setPosition((8 + 3.75) * s, 12 * s, (6 - 0.3) * s);
+//  kin.gl().camera.focus(0, 0, 0.5);
+//  kin.watch(true);
+  ///
   TrajectoryTreeVisualizer viz( framesAll, "composed policy", 10 );
 
   rai::wait();
