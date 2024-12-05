@@ -113,6 +113,31 @@ struct TargetPosition:Feature
     const arr targetPosition_; // in box's frame
 };
 
+// Position target position
+struct TargetZPosition:Feature
+{
+  TargetZPosition( const char* effectorName, const char * boxName, const double & targetZPosition, const double factor )
+    : effectorName_( effectorName )
+    , boxName_( boxName )
+    , targetPosition_( ARR(0.0, 0.0, targetZPosition) )
+    , factor_( factor ) // convention is eff - target; potentially use factor for ineq constraints
+  {
+
+  }
+
+  virtual void phi( arr& y, arr& J, const rai::KinematicWorld& G );
+
+  uint dim_phi( const rai::KinematicWorld& G ) { return 1; }
+
+  rai::String shortTag(const rai::KinematicWorld& G ){ return STRING("TargetZPosition"); }
+
+  private:
+    const rai::String effectorName_;
+    const rai::String boxName_;
+    const arr targetPosition_; // in box's frame
+    const double factor_;
+};
+
 // Zero velocity (to be used in 1st order to force a zero velocity)
 struct ZeroVelocity:Feature
 {

@@ -124,6 +124,36 @@ void TargetPosition::phi( arr& y, arr& J, const rai::KinematicWorld& G )
   if(&J) J = tmp_J;
 }
 
+//-----TargetZPosition----------------//
+
+void TargetZPosition::phi( arr& y, arr& J, const rai::KinematicWorld& G )
+{
+  arr tmp_y = zeros( 1 );
+  arr tmp_J = zeros( 1, G.q.N );
+
+  // effector
+  const auto effector = G.getFrameByName( effectorName_ );
+
+  arr effectorPosition, effectorJPosition;
+  G.kinematicsPos( effectorPosition, effectorJPosition, effector );
+
+  // box
+  const auto box = G.getFrameByName( boxName_ );
+
+  arr targetPosition, jTargetPosition;
+  G.kinematicsPos( targetPosition, jTargetPosition, box, targetPosition_ );
+
+  tmp_y = factor_ * (effectorPosition(2) - targetPosition(2)); // take the z
+  for(uint i{0}; i < G.q.N; ++i )
+  {
+    tmp_J(0, i) = factor_ * (effectorJPosition(2, i) - jTargetPosition(2, i));
+  }
+
+  // commit results
+  y = tmp_y;
+  if(&J) J = tmp_J;
+}
+
 
 //-----ZeroVelocity----------------//
 
