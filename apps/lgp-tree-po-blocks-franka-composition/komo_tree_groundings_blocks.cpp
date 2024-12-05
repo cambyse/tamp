@@ -28,7 +28,7 @@ double BlockToPositionX(const std::string& block, const std::string& place)
 {
   if(place.find("block") != std::string::npos)
   {
-    return 0.0;
+    return 0.0; // always stack centered onto another block
   }
 
   static std::map<std::string, double> blockToPosition{
@@ -63,10 +63,12 @@ void groundTreeUnStack(const mp::Interval& it, const mp::TreeBuilder& tb, const 
 
   const double t_switch {it.time.to};
   // approach
-  mp::Interval before{{t_switch - 0.2, t_switch - 0.2}, it.edge};
-  if(activateObjectives) W(komo).addObjective( before, tb, new TargetPosition( eff, object, ARR( 0.0, 0.0, 0.1 ) ), OT_sos, NoArr, 1e2, 0 ); // coming from above
+  mp::Interval before{{t_switch - 0.6, t_switch - 0.3}, it.edge};
+  if(activateObjectives) W(komo).addObjective( before, tb, new TargetZPosition( eff, object, 0.15, -1.0 ), OT_ineq, NoArr, 1e1, 0 ); // coming from above
 
-//  mp::Interval just_before{{it.time.to - 0.2, it.time.to}, it.edge};
+  if(activateObjectives) W(komo).addObjective( all, tb, new AxisAlignment( eff, ARR( 0.0, 0.0, 1.0 ), ARR( 0, 0, 1.0 ) ), OT_sos, NoArr, 5.0e1, 0 ); // the Y axis (lon axis of the gripper with finger) is // to Z
+
+//  mp::Interval all{{it.time.from, it.time.to}, it.edge};
 //  if(activateObjectives) W(komo).addObjective( just_before, tb, new AxisOrthogonal( eff, ARR( 0.0, 1.0, 0.0 ), ARR( 0, 0, 1.0 ) ), OT_sos, NoArr, 1e2, 0 ); // the Y axis (lon axis of the gripper with finger) is orthogonal to Z
 //  if(activateObjectives) W(komo).addObjective( just_before, tb, new BoxAxisAligned( eff, ARR( 1.0, 0.0, 0 ), object, ARR( -1.0, 0.0, 0 ) ), OT_sos, NoArr, 1e2, 0 ); // pick orthogonal to the sides
 
@@ -92,16 +94,20 @@ void groundTreeUnStack(const mp::Interval& it, const mp::TreeBuilder& tb, const 
 void groundTreePutDown(const mp::Interval& it, const mp::TreeBuilder& tb, const std::vector<std::string>& facts, KOMO_ext* komo, int verbose)
 {
   mp::Interval all{{it.time.from, it.time.to - 0.01}, it.edge}; // needs to revise ors to update limits which are not conistent with scaling?
-  if(activateObjectives)  W(komo).addObjective(all, tb, new mp::AgentKinBounds(), OT_ineq, NoArr, 1.0e2, 0);
+  if(activateObjectives)  W(komo).addObjective(all, tb, new mp::AgentKinBounds(), OT_ineq, NoArr, 5.0e2, 0);
 
   const auto& object = facts[0].c_str();
   const auto& place = facts[1].c_str();
+  const auto& eff = "franka_hand";
 
   const double t_switch {it.time.to};
 
+  // transfer
+  if(activateObjectives) W(komo).addObjective( all, tb, new AxisAlignment( eff, ARR( 0.0, 0.0, 1.0 ), ARR( 0, 0, 1.0 ) ), OT_sos, NoArr, 1e1, 0 ); // the Y axis (lon axis of the gripper with finger) is // to Z
+
   // approach
-  mp::Interval before{{t_switch - 0.4, t_switch - 0.4}, it.edge};
-  if(activateObjectives) W(komo).addObjective( before, tb, new TargetPosition( object, place, ARR( 0.0, 0.0, 0.1 ) ), OT_sos, NoArr, 0.5e2, 0 ); // coming from above
+  mp::Interval before{{t_switch - 0.6, t_switch - 0.4}, it.edge};
+  if(activateObjectives) W(komo).addObjective( before, tb, new TargetZPosition( object, place, 0.15, -1.0 ), OT_ineq, NoArr, 1e1, 0 ); // coming from above
 
 //  mp::Interval just_before{{t_switch - 0.2, t_switch - 0.01}, it.edge};
 //  if(activateObjectives) W(komo).addObjective( just_before, tb, new AxisAlignment( object, ARR( 0, 0, 1.0 ), ARR( 0, 0, 1.0 ) ), OT_sos, NoArr, 1e2, 0 );
@@ -141,9 +147,15 @@ void groundTreeCheck(const mp::Interval& it, const mp::TreeBuilder& tb, const st
   const double t_switch {it.time.to - 0.2};
   const double t_switch_2 {t_switch + 0.05};
 
+  // transfer
+  if(activateObjectives) W(komo).addObjective( all, tb, new AxisAlignment( eff, ARR( 0.0, 0.0, 1.0 ), ARR( 0, 0, 1.0 ) ), OT_sos, NoArr, 5.0e1, 0 ); // the Y axis (lon axis of the gripper with finger) is // to Z
+
   // approach
-  mp::Interval before{{t_switch - 0.4, t_switch - 0.4}, it.edge};
-  if(activateObjectives) W(komo).addObjective( before, tb, new TargetPosition( object, place, ARR( 0.0, 0.0, 0.1 ) ), OT_sos, NoArr, 1e2, 0 ); // coming from above
+  mp::Interval before{{t_switch - 0.6, t_switch - 0.4}, it.edge};
+  if(activateObjectives) W(komo).addObjective( before, tb, new TargetZPosition( object, place, 0.15, -1.0 ), OT_ineq, NoArr, 1e1, 0 ); // coming from above
+
+  //mp::Interval all{{it.time.from, it.time.to}, it.edge};
+  //if(activateObjectives) W(komo).addObjective( all, tb, new AxisOrthogonal( eff, ARR( 0.0, 1.0, 0.0 ), ARR( 0, 0, 1.0 ) ), OT_sos, NoArr, 1e2, 0 ); // the Y axis (lon axis of the gripper with finger) is orthogonal to Z
 
   // switch 1
   {
