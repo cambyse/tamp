@@ -25,9 +25,9 @@ double shapeSize(const KinematicWorld& K, const char* name, uint i=2);
 namespace explo{
 
 constexpr bool activateObjectives{true};
+constexpr double JointBounds_scale{1.0e2};
 constexpr double ZeroVelocity_scale{1.0e2};
 constexpr double TargetPosition_scale{1.0e2};
-constexpr double TM_AboveBox_scale{1.0e1};
 constexpr double SensorAimAtObjectCenter_scale{1.0e2};
 constexpr double SensorAlignsWithPivot_scale{1.0e2};
 constexpr double SensorDistanceToObject_scale{5.0e1};
@@ -145,7 +145,7 @@ void groundTreePickUp(const mp::Interval& it, const mp::TreeBuilder& tb, const s
 void groundTreeUnStack(const mp::Interval& it, const mp::TreeBuilder& tb, const std::vector<std::string>& facts, KOMO_ext* komo, int verbose)
 {
   mp::Interval all{{it.time.from, it.time.to - 0.01}, it.edge}; // needs to revise ors to update limits which are not conistent with scaling?
-  if(activateObjectives)  W(komo).addObjective(all, tb, new mp::AgentKinBounds(), OT_ineq, NoArr, 1.0e2, 0);
+  if(activateObjectives)  W(komo).addObjective(all, tb, new mp::AgentKinBounds(), OT_ineq, NoArr, JointBounds_scale, 0);
 
   const auto& eff = "franka_hand";
   const auto& object = facts[0].c_str();
@@ -176,7 +176,7 @@ void groundTreeUnStack(const mp::Interval& it, const mp::TreeBuilder& tb, const 
     mp::Interval end{{it.time.to, it.time.to}, it.edge};
     if(komo->k_order > 1 && !final_action)
     {
-      mp::Interval just_after{{it.time.to, it.time.to + 0.2}, it.edge};
+      mp::Interval just_after{{it.time.to, it.time.to + 0.15}, it.edge};
       if(activateObjectives) W(komo).addObjective( just_after, tb, new ZeroVelocity( object ), OT_eq, NoArr, ZeroVelocity_scale, 1 ); // force the object not to move when starting to pick (mainly to force it not to go under the table!) MAYBE completely wrong?! does it really affect velocities?
     }
   }
@@ -190,7 +190,7 @@ void groundTreeUnStack(const mp::Interval& it, const mp::TreeBuilder& tb, const 
 void groundTreePutDown(const mp::Interval& it, const mp::TreeBuilder& tb, const std::vector<std::string>& facts, KOMO_ext* komo, int verbose)
 {
   mp::Interval all{{it.time.from, it.time.to - 0.01}, it.edge}; // needs to revise ors to update limits which are not conistent with scaling?
-  if(activateObjectives)  W(komo).addObjective(all, tb, new mp::AgentKinBounds(), OT_ineq, NoArr, 1.0e2, 0);
+  if(activateObjectives)  W(komo).addObjective(all, tb, new mp::AgentKinBounds(), OT_ineq, NoArr, JointBounds_scale, 0);
 
   const auto& eff = "franka_hand";
   const auto& object = facts[0].c_str();
@@ -222,7 +222,7 @@ void groundTreePutDown(const mp::Interval& it, const mp::TreeBuilder& tb, const 
 
     if(komo->k_order > 1)
     {
-      mp::Interval just_after{{it.time.to, it.time.to + 0.2}, it.edge};
+      mp::Interval just_after{{it.time.to - 0.1, it.time.to}, it.edge};
       if(activateObjectives) W(komo).addObjective( just_after, tb, new ZeroVelocity( object ), OT_eq, NoArr, ZeroVelocity_scale, 1 ); // force the object not to move when starting to pick (mainly to force it not to go under the table)
     }
   }
@@ -242,7 +242,7 @@ void groundTreePutDownFlipped(const mp::Interval& it, const mp::TreeBuilder& tb,
 void groundTreeCheck(const mp::Interval& it, const mp::TreeBuilder& tb, const std::vector<std::string>& facts, KOMO_ext* komo, int verbose)
 {
   mp::Interval all{{it.time.from, it.time.to - 0.01}, it.edge}; // needs to revise ors to update limits which are not conistent with scaling?
-  if(activateObjectives)  W(komo).addObjective(all, tb, new mp::AgentKinBounds(), OT_ineq, NoArr, 1.0e2, 0);
+  if(activateObjectives)  W(komo).addObjective(all, tb, new mp::AgentKinBounds(), OT_ineq, NoArr, JointBounds_scale, 0);
   //
 
   const auto& eff = "franka_hand";
