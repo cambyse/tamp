@@ -41,13 +41,15 @@ void groundTreeUnStack(const mp::Interval& it, const mp::TreeBuilder& tb, const 
   if(activateObjectives)  W(komo).addObjective(all, tb, new LimitsConstraint(0.05), OT_ineq, NoArr, 1.0, 0);
 
   // approach
-  mp::Interval before{{it.time.to - 0.3, it.time.to - 0.3}, it.edge};
-  if(activateObjectives) W(komo).addObjective( before, tb, new TargetPosition( eff, object, ARR( 0.0, 0.0, 0.1 ) ), OT_sos, NoArr, 1e2, 0 ); // coming from above
+  mp::Interval before{{it.time.to - 0.6, it.time.to - 0.35}, it.edge};
+  if(activateObjectives) W(komo).addObjective( before, tb, new TargetZPosition( eff, object, 0.15, -1.0 ), OT_ineq, NoArr, 1e1, 0 ); // coming from above
+
+  mp::Interval until_grasp{{it.time.to - 0.35, it.time.to - 0.01}, it.edge};
+  if(activateObjectives) W(komo).addObjective( until_grasp, tb, new ZeroXYVelocity( eff ), OT_eq, NoArr, 1e1, 1 ); // coming from above
 
   // switch
   mp::Interval st{{it.time.to, it.time.to}, it.edge};
   Transformation rel{0};
-  rel.rot.setRadZ(0.0);
   rel.rot.setRadY(-M_PI_2);
   rel.pos.set(0, 0, 0);
   W(komo).addSwitch(st, tb, new KinematicSwitch(SW_effJoint, JT_rigid, eff, object, komo->world, SWInit_zero, 0, rel));
@@ -95,15 +97,15 @@ void groundTreePutDown(const mp::Interval& it, const mp::TreeBuilder& tb, const 
   if(activateObjectives)  W(komo).addObjective(all, tb, new LimitsConstraint(0.05), OT_ineq, NoArr, 1.0, 0);
 
   /// Version based on franka example
-  mp::Interval before{{it.time.to - 0.3, it.time.to - 0.3}, it.edge};
   // approach
-  if(activateObjectives) W(komo).addObjective( before, tb, new TargetPosition( object, place, ARR( 0.0, 0.0, 0.1 ) ), OT_sos, NoArr, 1e2, 0 ); // coming from above
+  mp::Interval before{{it.time.to - 0.6, it.time.to - 0.35}, it.edge};
+  if(activateObjectives) W(komo).addObjective( before, tb, new TargetZPosition( object, place, 0.15, -1.0 ), OT_ineq, NoArr, 1e1, 0 ); // coming from above
 
   mp::Interval just_before{{it.time.to - 0.2, it.time.to - 0.01}, it.edge};
   //if(activateObjectives) W(komo).addObjective( just_before, tb, new AxisAlignment( object, ARR( 0, 0, 1.0 ), ARR( 0, 0, 1.0 ) ), OT_sos, NoArr, 1e2, 0 );
 
   mp::Interval end{{it.time.to, it.time.to}, it.edge};
-  if(activateObjectives) W(komo).addObjective(end, tb, new TM_AboveBox(komo->world, object, place), OT_ineq, NoArr, 1e1, 0);
+  if(activateObjectives) W(komo).addObjective(end, tb, new TM_AboveBox(komo->world, object, place, 0.04), OT_ineq, NoArr, 1e1, 0);
 
   // switch
   mp::Interval st{{it.time.to, it.time.to}, it.edge};
