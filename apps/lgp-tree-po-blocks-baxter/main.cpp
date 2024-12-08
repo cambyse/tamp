@@ -429,13 +429,23 @@ void plan_Journal_2024()
 
   // set start configurations
   // D
+  {
+    tp.setR0( -0.1, 40.0 ); // -10.0, -0.1
+    tp.setNIterMinMax( 750000, 1000000 );
+    tp.setRollOutMaxSteps( 75 );
+    tp.setFol( "LGP-blocks-fol-one-table-no-precondition_easy.g" );
+    mp.setKin( "LGP-blocks-kin-one-table.g" );
+  }
+
+  // E
 //  {
-//    tp.setR0( 0.1, 50.0 );
-//    tp.setNIterMinMax( 1000000, 10000000 ); // 1000000 - by default
+//    tp.setR0( -0.1, 75.0 );
+//    tp.setNIterMinMax( 2000000, 10000000 ); // 1000000 - by default
 //    tp.setRollOutMaxSteps( 100 );
-//      tp.setFol( "LGP-blocks-fol-one-table-no-precondition.g" );
-//      mp.setKin( "LGP-blocks-kin-one-table.g" );
+//    //tp.setFol( "LGP-blocks-fol-one-table-no-precondition.g" ); -> too pesimistic logic, use only for Phd to show limit of MCTS when buliding all the tree upfront
+//    mp.setKin( "LGP-blocks-kin-one-table.g" );
 //  }
+
   // C
 //  {
 //    tp.setR0( -0.1, 15.0 ); // -10.0, -0.1
@@ -449,7 +459,7 @@ void plan_Journal_2024()
   // checked, probably doesn't work with n steps = 5
   // B
 //  {
-//    tp.setR0( -10.0, 15.0 ); // -10.0, -0.1
+//    tp.setR0( -0.1, 15.0 ); // -10.0, -0.1
 //    tp.setNIterMinMax( 100000, 1000000 );
 //    tp.setRollOutMaxSteps( 50 );
 //    tp.setFol( "LGP-blocks-fol-2w-one-table.g" );
@@ -458,14 +468,14 @@ void plan_Journal_2024()
 //  }
 
   // A
-  {
-    tp.setR0( -0.1, 15.0 ); // -10.0, -0.1
-    tp.setNIterMinMax( 50000, 1000000 );
-    tp.setRollOutMaxSteps( 50 );
-    tp.setFol( "LGP-blocks-fol-1w-one-table.g" );
-    //tp.setFol( "LGP-blocks-fol-1w-one-table-no-precondition.g" );
-    mp.setKin( "LGP-blocks-kin-1w-one-table.g" );
-  }
+//  {
+//    tp.setR0( -10.0, 15.0 ); // -10.0, -0.1
+//    tp.setNIterMinMax( 50000, 1000000 );
+//    tp.setRollOutMaxSteps( 50 );
+//    tp.setFol( "LGP-blocks-fol-1w-one-table.g" );
+//    //tp.setFol( "LGP-blocks-fol-1w-one-table-no-precondition.g" );
+//    mp.setKin( "LGP-blocks-kin-1w-one-table.g" );
+//  }
 
   // 4 blocks linear
   //tp.setFol( "LGP-blocks-fol-4-blocks-1w-one-table.g" );
@@ -499,6 +509,7 @@ void plan_Journal_2024()
   TAMPlanningConfiguration config;
   config.watchMarkovianOptimizationResults = false;
   config.watchJointOptimizationResults = false;
+  config.saveVideo = true;
   tamp.plan(config);
 }
 
