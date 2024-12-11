@@ -245,3 +245,23 @@ struct ZeroVelocityOfAllXYPhiJoints:Feature
     rai::String shortTag(const rai::KinematicWorld& G ){ return STRING("ZeroVelocityOfAllXYPhiJoints"); }
 };
 
+// Zero XY Velocities
+struct ZeroXYVelocity:Feature
+{
+    ZeroXYVelocity( const char* objectName )
+      : objectName_( objectName )
+    {
+
+    }
+
+    virtual void phi( arr& y, arr& J, const WorldL& Gs ) override;
+    virtual void phi( arr& y, arr& J, const rai::KinematicWorld& G ) override;
+
+    uint dim_phi( const rai::KinematicWorld& G ) override;
+
+    rai::String shortTag(const rai::KinematicWorld& G ){ return STRING("ZeroZVelocity"); }
+
+private:
+    const rai::String objectName_;
+};
+

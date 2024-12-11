@@ -339,9 +339,59 @@ uint ZeroVelocityOfAllXYPhiJoints::dim_phi( const rai::KinematicWorld& G )
   {
     if(frame->joint && frame->joint->type == rai::JT_transXYPhi)
     {
-      d+=7;
+      d+=7; // hardcoded!? why is it 7 is it robot dependent? no it is 4 (quaternion) + 3 translations
     }
   }
 
   return d;
+}
+
+// Zero XY Velocities
+void ZeroXYVelocity::phi( arr& y, arr& J, const WorldL& Gs )
+{
+  CHECK(order==1,"");
+  CHECK(Gs.size() >= 1,"");
+
+  const auto dim_Phi{ dim_phi(*Gs(-1))};
+
+  y.resize(dim_Phi);
+  if(!!J){
+    uintA qidx(Gs.N);
+    qidx(0)=0;
+    for(uint i=1;i<Gs.N;i++) qidx(i) = qidx(i-1)+Gs(i-1)->q.N;
+    J = zeros(y.N, qidx.last()+Gs.last()->q.N);
+  }
+
+  const auto frame = Gs(-1)->getFrameByName(objectName_);
+
+  // get speed vector
+  arr y_vel,Jvel;
+  TM_Default vel(TMT_poseDiff, frame->ID); // to prevent both velocity and orientation changes
+  vel.order = 1;
+  vel.__phi(y_vel, Jvel, Gs);
+
+  uint d=0;
+  for(uint i: {0, 1, 3, 4, 5, 6}) // skip 2 on purpose, this corresponds to the velocity on Z axis
+  {
+    y(d) = y_vel(i);
+
+    if(!!J)
+    {
+      for(uint j = 0; j < Jvel.d1; ++j)
+      {
+        J(d, j) = Jvel(i, j);
+      }
+    }
+    ++d;
+  }
+}
+
+void ZeroXYVelocity::phi( arr& y, arr& J, const rai::KinematicWorld& G )
+{
+   CHECK(false, "");
+}
+
+uint ZeroXYVelocity::dim_phi( const rai::KinematicWorld& G )
+{
+  return 6; // (4 quat, + 2 translations)
 }
