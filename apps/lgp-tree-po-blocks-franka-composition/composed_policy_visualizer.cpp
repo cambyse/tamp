@@ -31,17 +31,18 @@ void ComposedPolicyVisualizer::visualizeComposedPolicy(
     const KOMOFactory& komoFactoryHigh,
     const KOMOFactory& komoFactoryLow) const
 {
+  // paper video
   const auto framesHigh = createFramesFor(startKinematicsHigh(0), policyHigh, XHigh, komoFactoryHigh, 4);
   const auto framesHigh_1 = createFramesFor(startKinematicsHigh(1), policyHigh, XHigh, komoFactoryHigh, 4); // blue (side 5)
   const auto framesHigh_2 = createFramesFor(startKinematicsHigh(2), policyHigh, XHigh, komoFactoryHigh, 4); // red  (side 0)
   const auto framesHigh_3 = createFramesFor(startKinematicsHigh(3), policyHigh, XHigh, komoFactoryHigh, 4); // green (side 3)
 
-  //const_cast<rai::KinematicWorld*>(startKinematicsHigh(0)(0).get())->watch(true);
+  //const_cast<rai::KinematicWorld*>(startKinematicsHigh(0)(4).get())->watch(true);
   //const_cast<rai::KinematicWorld*>(startKinematicsHigh(1)(0).get())->watch(true);
 
   const auto framesLow = createFramesFor(startKinematicsLow(0), policyLow, XLow, komoFactoryLow, 5);   // blue
   const auto framesLow_1 = createFramesFor(startKinematicsLow(1), policyLow, XLow, komoFactoryLow, 0); // red
-  const auto framesLow_2 = createFramesFor(startKinematicsLow(2), policyLow, XLow, komoFactoryLow, 3); // green
+  const auto framesLow_2 = createFramesFor(startKinematicsLow(2), policyLow, XLow, komoFactoryLow, 1); // green
 
   rai::Array< rai::KinematicWorld > framesConcatenated;
 
@@ -95,9 +96,78 @@ void ComposedPolicyVisualizer::visualizeComposedPolicy(
 //  kin.gl().camera.focus(0, 0, 0.5);
 //  kin.watch(true);
   ///
-  TrajectoryTreeVisualizer viz( framesAll, "composed policy", 10 );
+  TrajectoryTreeVisualizer viz( framesAll, "composed policy", 10, true );
 
   rai::wait();
+
+  // paper pictures
+//  const auto framesHigh = createFramesFor(startKinematicsHigh(0), policyHigh, XHigh, komoFactoryHigh, 4);
+//  const auto framesHigh_1 = createFramesFor(startKinematicsHigh(1), policyHigh, XHigh, komoFactoryHigh, 4); // blue (side 5)
+//  const auto framesHigh_2 = createFramesFor(startKinematicsHigh(2), policyHigh, XHigh, komoFactoryHigh, 4); // red  (side 0)
+//  const auto framesHigh_3 = createFramesFor(startKinematicsHigh(3), policyHigh, XHigh, komoFactoryHigh, 4); // green (side 3)
+
+//  //const_cast<rai::KinematicWorld*>(startKinematicsHigh(0)(0).get())->watch(true);
+//  //const_cast<rai::KinematicWorld*>(startKinematicsHigh(1)(0).get())->watch(true);
+
+//  const auto framesLow = createFramesFor(startKinematicsLow(0), policyLow, XLow, komoFactoryLow, 5);   // blue
+//  const auto framesLow_1 = createFramesFor(startKinematicsLow(1), policyLow, XLow, komoFactoryLow, 0); // red
+//  const auto framesLow_2 = createFramesFor(startKinematicsLow(2), policyLow, XLow, komoFactoryLow, 3); // green
+
+//  rai::Array< rai::KinematicWorld > framesConcatenated;
+
+//  uint switchToLow_0{2 * config_.microSteps_ + k_order_};
+//  uint switchToLow_1{5 * config_.microSteps_ + k_order_};
+//  uint switchToLow_2{8 * config_.microSteps_ + k_order_};
+
+//  std::vector<VisualizationInterval> intervals;
+//  intervals.push_back(VisualizationInterval{0, switchToLow_0, &framesHigh}); // bring blue
+//  intervals.push_back(VisualizationInterval{k_order_, framesLow.d0, &framesLow}); // observe blue
+//  intervals.push_back(VisualizationInterval{switchToLow_0, switchToLow_1, &framesHigh_1}); // place blue and pick red
+//  intervals.push_back(VisualizationInterval{k_order_, framesLow_1.d0, &framesLow_1}); // observe red
+//  intervals.push_back(VisualizationInterval{switchToLow_1, switchToLow_2, &framesHigh_2}); // place red and pick green
+//  intervals.push_back(VisualizationInterval{k_order_, framesLow_2.d0, &framesLow_2}); // observe green
+//  intervals.push_back(VisualizationInterval{switchToLow_2, framesHigh_3.d0, &framesHigh_3}); // stack green
+
+//  uint j{0};
+
+//  for(const auto& interval: intervals)
+//  {
+//    framesConcatenated.resize(framesConcatenated.d0 + interval.end - interval.start);
+
+//    for(uint i{interval.start}; i < interval.end; ++i)
+//    {
+//      framesConcatenated(j).copy((*interval.frames)(i));
+//      ++j;
+//    }
+//  }
+
+//  rai::Array< rai::Array< rai::Array< rai::KinematicWorld > > > framesAll; // for each leave, for each worl, the frame list
+//  framesAll.resize(1);
+//  framesAll(0).resize(1);
+//  framesAll(0)(0) = framesConcatenated;
+
+
+//  /// debug for keyframes
+////  for(auto i = 0; i < framesConcatenated.d0 / 20; ++i)
+////  {
+////    auto& kin = (framesAll(0)(0)(20 * i));
+////    auto& camera = kin.gl().camera;
+////    double s{0.35};
+////    kin.gl().camera.setPosition((8 + 3.75) * s, 12 * s, (6 - 0.3) * s);
+////    kin.gl().camera.focus(0, 0, 0.5);
+////    kin.watch(true);
+////  }
+
+////  auto& kin = (framesAll(0)(0)(-1));
+////  auto& camera = kin.gl().camera;
+////  double s{0.35};
+////  kin.gl().camera.setPosition((8 + 3.75) * s, 12 * s, (6 - 0.3) * s);
+////  kin.gl().camera.focus(0, 0, 0.5);
+////  kin.watch(true);
+//  ///
+//  TrajectoryTreeVisualizer viz( framesAll, "composed policy", 10 );
+
+//  rai::wait();
 }
 
 rai::Array< rai::KinematicWorld > ComposedPolicyVisualizer::createFramesFor(const rai::Array< std::shared_ptr< const rai::KinematicWorld > > & startKinematics,

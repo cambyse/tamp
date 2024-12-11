@@ -36,7 +36,7 @@ public:
                                                     const KOMOFactory& komoFactory,
                                                     const uint w) const;
 
-  void optimize( Policy &, const rai::Array< std::shared_ptr< const rai::KinematicWorld > > &, bool watch ) const override {};
+  void optimize( Policy &, const rai::Array< std::shared_ptr< const rai::KinematicWorld > > &, bool watch, bool saveVideo ) const override {};
 
   const uint k_order_{2};
 };
