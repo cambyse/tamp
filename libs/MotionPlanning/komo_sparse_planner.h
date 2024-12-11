@@ -31,18 +31,19 @@ public:
                                  const Policy & policy,
                                  const std::shared_ptr< ExtensibleKOMO > & komo ) const;
   void watch( const std::shared_ptr< ExtensibleKOMO > & komo ) const;
-  void watch( const std::shared_ptr< ExtensibleKOMO > & komo, const TreeBuilder & tree ) const; // watch using only the witness komo -> inconsistent for visualization
+  void watch( const std::shared_ptr< ExtensibleKOMO > & komo, const TreeBuilder & tree, const bool saveVideo ) const; // watch using only the witness komo -> inconsistent for visualization
   void watch( const rai::Array< std::shared_ptr< const rai::KinematicWorld > > & startKinematics, // consistent watch with different worlds
               const rai::Array<rai::KinematicSwitch*> switches,
               const Policy & policy,
               const TreeBuilder & tree,
               const XVariable& X,
               const uint stepsPerPhase,
-              const uint k_order ) const;
+              const uint k_order,
+              const bool saveVideo ) const;
 
   OptimizationReport getOptimizationReport(const std::shared_ptr< ExtensibleKOMO > & komo, const std::vector<Vars>& allVars ) const; // use witness komo and task grounding inside it
 
-  virtual void optimize( Policy &, const rai::Array< std::shared_ptr< const rai::KinematicWorld > > &, bool watch ) const = 0;
+  virtual void optimize( Policy &, const rai::Array< std::shared_ptr< const rai::KinematicWorld > > &, bool watchResults, bool saveVideo ) const = 0;
 
 protected:
   using W = KomoWrapper;
@@ -57,7 +58,7 @@ public:
   JointPlanner(const KOMOPlannerConfig& config, const KOMOFactory& factory)
     : KOMOSparsePlanner(config, factory)
   {};
-  void optimize( Policy &, const rai::Array< std::shared_ptr< const rai::KinematicWorld > > &, bool ) const override;
+  void optimize( Policy &, const rai::Array< std::shared_ptr< const rai::KinematicWorld > > &, bool watchResults, bool saveVideo ) const override;
 };
 
 // Ground all tasks, full opt variable, xmasks in ADMM-Graph-Problem reduce the pb
@@ -67,7 +68,7 @@ public:
   ADMMSParsePlanner(const KOMOPlannerConfig& config, const KOMOFactory& factory)
     : KOMOSparsePlanner(config, factory)
   {};
-  void optimize( Policy &, const rai::Array< std::shared_ptr< const rai::KinematicWorld > > &, bool ) const override;
+  void optimize( Policy &, const rai::Array< std::shared_ptr< const rai::KinematicWorld > > &, bool watchResults, bool saveVideo ) const override;
 };
 
 
@@ -86,7 +87,7 @@ public:
                                       const Mapping & mapping,
                                       Policy & policy,
                                       const std::shared_ptr< ExtensibleKOMO > & komo ) const;
-  void optimize( Policy &, const rai::Array< std::shared_ptr< const rai::KinematicWorld > > &, bool ) const override;
+  void optimize( Policy &, const rai::Array< std::shared_ptr< const rai::KinematicWorld > > &, bool watchResults, bool saveVideo ) const override;
 
 private:
   GeneratorFactory generatorFactory_;
@@ -107,7 +108,7 @@ public:
     , X_(X)
     , reportFile_(reportFile)
   {};
-  void optimize( Policy &, const rai::Array< std::shared_ptr< const rai::KinematicWorld > > &, bool ) const override;
+  void optimize( Policy &, const rai::Array< std::shared_ptr< const rai::KinematicWorld > > &, bool watchResults, bool saveVideo ) const override;
 
   XVariable X_;
   std::string reportFile_;

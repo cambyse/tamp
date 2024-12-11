@@ -185,7 +185,7 @@ std::vector< double > KOMOPlanner::drawRandomVector( const std::vector< double >
   return randomVec_;
 }
 
-void KOMOPlanner::solveAndInform( const MotionPlanningParameters & po, Policy & policy, bool watch )
+void KOMOPlanner::solveAndInform( const MotionPlanningParameters & po, Policy & policy, bool watch, bool saveVideo )
 {
   CHECK( startKinematics_.d0 == policy.N(), "consistency problem, the belief state size of the policy differs from the belief state size of the kinematics" );
   CHECK( po.policyId() == policy.id(), "id of the policy and the planning orders are not consistent" );
@@ -215,18 +215,18 @@ void KOMOPlanner::solveAndInform( const MotionPlanningParameters & po, Policy & 
   else if( po.getParam( "type" ) == "jointSparse" )
   {
     JointPlanner planner(config_, komoFactory_);
-    planner.optimize(policy, startKinematics_, watch);
+    planner.optimize(policy, startKinematics_, watch, saveVideo);
   }
   else if( po.getParam( "type" ) == "ADMMSparse" )
   {
     ADMMSParsePlanner planner(config_, komoFactory_);
-    planner.optimize(policy, startKinematics_, watch);
+    planner.optimize(policy, startKinematics_, watch, saveVideo);
   }
   else if( po.getParam( "type" ) == "ADMMCompressed" )
   {
     ADMMCompressedPlanner planner(config_, komoFactory_, getMarkovianPathTreeVariableQDim(policy));
     planner.setDecompositionStrategy(po.getParam("decompositionStrategy"), po.getParam("nJobs"));
-    planner.optimize(policy, startKinematics_, watch);
+    planner.optimize(policy, startKinematics_, watch, saveVideo);
   }
   else if( po.getParam( "type" ) == "ADMMDecompose" )
   {
@@ -236,7 +236,7 @@ void KOMOPlanner::solveAndInform( const MotionPlanningParameters & po, Policy & 
   else if( po.getParam( "type" ) == "EvaluateMarkovianCosts" )
   {
     EvaluationPlanner evaluation(config_, komoFactory_, getMarkovianPathTreeVariableQDim(policy), "results/optimizationReportMarkovianPathTree.re");
-    evaluation.optimize(policy, startKinematics_, watch);
+    evaluation.optimize(policy, startKinematics_, watch, saveVideo);
   }
   else
   {
@@ -521,6 +521,7 @@ void KOMOPlanner::optimizeMarkovianPathFrom( const Policy::GraphNodeTypePtr & no
 
     rai::KinematicWorld kin = node->isRoot() ? *( startKinematics_( w ) ) : ( effMarkovianPathKinematics_.find( node->parent()->data().decisionGraphNodeId )->second );
 
+    //kin.watch(true);
     // create komo
     auto komo = komoFactory_.createKomo();
 
@@ -572,6 +573,7 @@ void KOMOPlanner::optimizeMarkovianPathFrom( const Policy::GraphNodeTypePtr & no
     if( node->id() == 2 /*|| node->id() == 2 || node->id() == 3 || node->id() == 4 || node->id() == 5 || node->id() == 6 || node->id() == 7 || node->id() == 8 || node->id() == 9*/ )
     {
 //      komo->getReport(true);
+//      komo->displayTrajectory();
 ////      komo->configurations.front()->watch(true);
 //      komo->configurations.last()->watch(true);
 //      komo->displayTrajectory();
