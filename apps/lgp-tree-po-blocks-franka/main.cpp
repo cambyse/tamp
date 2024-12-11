@@ -78,7 +78,7 @@ void display_robot()
 
 void plan_4_blocks()
 {
-  srand(1);
+  //srand(1);
 
   // build planner
   matp::MCTSPlanner tp;
@@ -117,15 +117,12 @@ void plan_4_blocks()
 
 void plan_3_blocks()
 {
-  srand(1);
+  //srand(1);
 
   // build planner
   matp::MCTSPlanner tp;
   mp::KOMOPlanner mp;
 
-  tp.setR0( -1.0, 15.0 );
-  tp.setNIterMinMax( 50000, 1000000 );
-  tp.setRollOutMaxSteps( 50 );
   tp.setNumberRollOutPerSimulation( 1 );
   tp.setVerbose( false );
 
@@ -135,8 +132,15 @@ void plan_3_blocks()
   mp.addCostIrrelevantTask( "FixSwichedObjects" );
 
   // set problem
-  tp.setFol( "LGP-3-blocks-1-side-fol.g" );
-  mp.setKin( "LGP-3-blocks-1-side-kin.g" );
+  // A
+  {
+    tp.setR0( -0.1, 15.0 );
+    tp.setNIterMinMax( 100000, 1000000 );
+    tp.setRollOutMaxSteps( 50 );
+    tp.setFol( "LGP-3-blocks-1-side-fol.g" );
+    mp.setKin( "LGP-3-blocks-1-side-kin.g" );
+  }
+
 
   // register symbols
   mp.registerInit( groundTreeInit );
