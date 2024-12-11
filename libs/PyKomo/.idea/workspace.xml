@@ -2,15 +2,67 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="bc3df9aa-9300-4f70-9b75-cee7ee09a17e" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../../apps/lgp-real-time/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../../apps/lgp-real-time/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../apps/lgp-seq-boxes/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../../apps/lgp-seq-boxes/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../apps/lgp-tree-po-self-driving/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../../apps/lgp-tree-po-self-driving/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../CollisionAvoidance/axis_alignment.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../CollisionAvoidance/axis_alignment.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../CollisionAvoidance/axis_alignment.h" beforeDir="false" afterPath="$PROJECT_DIR$/../CollisionAvoidance/axis_alignment.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../../rai" beforeDir="false" afterPath="$PROJECT_DIR$/../../../../../rai" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../apps/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../../apps/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../apps/DomainPlayer/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../../apps/DomainPlayer/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../apps/DomainPlayer/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../../apps/DomainPlayer/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../apps/lgp-tree-po-blocks-baxter/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../../apps/lgp-tree-po-blocks-baxter/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../apps/lgp-tree-po-blocks-baxter/komo_tree_groundings.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../../apps/lgp-tree-po-blocks-baxter/komo_tree_groundings.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../apps/lgp-tree-po-blocks-baxter/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../../apps/lgp-tree-po-blocks-baxter/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../apps/lgp-tree-po-blocks-explo-baxter/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../../apps/lgp-tree-po-blocks-explo-baxter/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../apps/lgp-tree-po-blocks-explo-franka/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../../apps/lgp-tree-po-blocks-explo-franka/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CollisionAvoidance/axis_alignment.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CollisionAvoidance/axis_alignment.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../CollisionAvoidance/over_plane.h" beforeDir="false" afterPath="$PROJECT_DIR$/../CollisionAvoidance/over_plane.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GeometricUtilityTasks/geom_utility.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../GeometricUtilityTasks/geom_utility.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../MathUtility/graph_node.h" beforeDir="false" afterPath="$PROJECT_DIR$/../MathUtility/graph_node.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MotionPlanning/komo_factory.h" beforeDir="false" afterPath="$PROJECT_DIR$/../MotionPlanning/komo_factory.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MotionPlanning/komo_planner.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../MotionPlanning/komo_planner.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MotionPlanning/komo_planner.h" beforeDir="false" afterPath="$PROJECT_DIR$/../MotionPlanning/komo_planner.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MotionPlanning/komo_planner_config.h" beforeDir="false" afterPath="$PROJECT_DIR$/../MotionPlanning/komo_planner_config.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MotionPlanning/komo_planner_utils.h" beforeDir="false" afterPath="$PROJECT_DIR$/../MotionPlanning/komo_planner_utils.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MotionPlanning/komo_sparse_planner.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../MotionPlanning/komo_sparse_planner.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MotionPlanning/komo_sparse_planner.h" beforeDir="false" afterPath="$PROJECT_DIR$/../MotionPlanning/komo_sparse_planner.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MotionPlanning/komo_sub_problems_finder.h" beforeDir="false" afterPath="$PROJECT_DIR$/../MotionPlanning/komo_sub_problems_finder.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MotionPlanning/komo_wrapper.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../MotionPlanning/komo_wrapper.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MotionPlanning/komo_wrapper.h" beforeDir="false" afterPath="$PROJECT_DIR$/../MotionPlanning/komo_wrapper.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MotionPlanning/subtree_generators.h" beforeDir="false" afterPath="$PROJECT_DIR$/../MotionPlanning/subtree_generators.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MotionPlanning/test/test_komo_hessian_decomposition.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../MotionPlanning/test/test_komo_hessian_decomposition.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MotionPlanning/test/test_subtree_generators.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../MotionPlanning/test/test_subtree_generators.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MotionPlanning/trajectory_tree_visualizer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../MotionPlanning/trajectory_tree_visualizer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MotionPlanning/tree_builder.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../MotionPlanning/tree_builder.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MotionPlanning/tree_builder.h" beforeDir="false" afterPath="$PROJECT_DIR$/../MotionPlanning/tree_builder.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MultiAgentTaskPlanning/constants.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../MultiAgentTaskPlanning/constants.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MultiAgentTaskPlanning/constants.h" beforeDir="false" afterPath="$PROJECT_DIR$/../MultiAgentTaskPlanning/constants.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MultiAgentTaskPlanning/decision_graph.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../MultiAgentTaskPlanning/decision_graph.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MultiAgentTaskPlanning/decision_graph.h" beforeDir="false" afterPath="$PROJECT_DIR$/../MultiAgentTaskPlanning/decision_graph.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MultiAgentTaskPlanning/decision_graph_printer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../MultiAgentTaskPlanning/decision_graph_printer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MultiAgentTaskPlanning/decision_graph_printer.h" beforeDir="false" afterPath="$PROJECT_DIR$/../MultiAgentTaskPlanning/decision_graph_printer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MultiAgentTaskPlanning/graph_planner.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../MultiAgentTaskPlanning/graph_planner.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MultiAgentTaskPlanning/graph_planner.h" beforeDir="false" afterPath="$PROJECT_DIR$/../MultiAgentTaskPlanning/graph_planner.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MultiAgentTaskPlanning/logic_engine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../MultiAgentTaskPlanning/logic_engine.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MultiAgentTaskPlanning/logic_engine.h" beforeDir="false" afterPath="$PROJECT_DIR$/../MultiAgentTaskPlanning/logic_engine.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MultiAgentTaskPlanning/logic_parser.h" beforeDir="false" afterPath="$PROJECT_DIR$/../MultiAgentTaskPlanning/logic_parser.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MultiAgentTaskPlanning/mcts_decision_tree.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../MultiAgentTaskPlanning/mcts_decision_tree.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MultiAgentTaskPlanning/test/test_decision_graph.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../MultiAgentTaskPlanning/test/test_decision_graph.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MultiAgentTaskPlanning/test/test_graph_planner.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../MultiAgentTaskPlanning/test/test_graph_planner.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MultiAgentTaskPlanning/value_iteration.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../MultiAgentTaskPlanning/value_iteration.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MultiAgentTaskPlanning/value_iteration.h" beforeDir="false" afterPath="$PROJECT_DIR$/../MultiAgentTaskPlanning/value_iteration.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ObservationTasks/observation_tasks.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../ObservationTasks/observation_tasks.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ObservationTasks/observation_tasks.h" beforeDir="false" afterPath="$PROJECT_DIR$/../ObservationTasks/observation_tasks.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Optimization/decentralized_lagrangian.tpp" beforeDir="false" afterPath="$PROJECT_DIR$/../Optimization/decentralized_lagrangian.tpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Optimization/decentralized_optimizer.tpp" beforeDir="false" afterPath="$PROJECT_DIR$/../Optimization/decentralized_optimizer.tpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Optimization/test/functions.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../Optimization/test/functions.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Optimization/test/test_opt_constrained.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../Optimization/test/test_opt_constrained.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../POMTP_controllers/joint_path_tamp_controller.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../POMTP_controllers/joint_path_tamp_controller.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../POMTP_interfaces/motion_planner.h" beforeDir="false" afterPath="$PROJECT_DIR$/../POMTP_interfaces/motion_planner.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../POMTP_interfaces/skeleton.h" beforeDir="false" afterPath="$PROJECT_DIR$/../POMTP_interfaces/skeleton.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../POMTP_interfaces/skeleton_printer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../POMTP_interfaces/skeleton_printer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../POMTP_interfaces/skeleton_printer.h" beforeDir="false" afterPath="$PROJECT_DIR$/../POMTP_interfaces/skeleton_printer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../POMTP_interfaces/tamp_controller.h" beforeDir="false" afterPath="$PROJECT_DIR$/../POMTP_interfaces/tamp_controller.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TaskPlanning/graph_printer.h" beforeDir="false" afterPath="$PROJECT_DIR$/../TaskPlanning/graph_printer.h" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -20,15 +72,6 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/optimization/test/test_qp_decomposition.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="990">
-              <caret line="70" selection-start-line="70" selection-end-line="70" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/optimization/decentralized_aula.py">
           <provider selected="true" editor-type-id="text-editor">
@@ -77,10 +120,10 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/komo/test/test_komo.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
+            <state relative-caret-position="-720">
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -91,7 +134,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../../../../../../openai-quickstart-python/app.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="270">
+            <state relative-caret-position="315">
               <caret line="21" column="55" selection-start-line="21" selection-start-column="55" selection-end-line="21" selection-end-column="55" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
@@ -100,7 +143,7 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../../../../../../etf_vs_immo/simulation.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="75">
@@ -251,12 +294,18 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
               <item name="PyKomo" type="b2602c69:ProjectViewProjectNode" />
               <item name="PyKomo" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="PyKomo" type="b2602c69:ProjectViewProjectNode" />
+              <item name="PyKomo" type="462c0819:PsiDirectoryNode" />
+              <item name="komo" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="PyKomo" type="b2602c69:ProjectViewProjectNode" />
@@ -271,13 +320,12 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="Python" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../../../../etf_vs_immo/simulation.py" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../../../../etf_vs_immo/plot_g.py" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyIntegratedToolsModulesConfigurable" />
   </component>
   <component name="PyConsoleOptionsProvider">
@@ -505,6 +553,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="72" y="27" width="1848" height="1053" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49884528" visible="true" weight="0.24931507" />
       <window_info id="Structure" order="1" sideWeight="0.5011547" side_tool="true" weight="0.2496124" />
@@ -658,13 +707,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/numpy/lib/twodim_base.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="157">
-          <caret line="200" selection-start-line="200" selection-end-line="200" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/matplotlib/projections/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="213">
@@ -1003,25 +1045,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/komo/test/test_komo.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../../../../../openai-quickstart-python/app.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="21" column="55" selection-start-line="21" selection-start-column="55" selection-end-line="21" selection-end-column="55" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/optimization/admm_solver.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="270">
@@ -1031,6 +1054,9 @@
           </folding>
         </state>
       </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../../../../../etf_vs_immo/plot_g.py">
+      <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/komo/plot.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -1045,6 +1071,25 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="75">
           <caret line="5" column="26" selection-start-line="5" selection-start-column="25" selection-end-line="5" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../../../../../openai-quickstart-python/app.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="21" column="55" selection-start-line="21" selection-start-column="55" selection-end-line="21" selection-end-column="55" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/komo/test/test_komo.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-720">
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
