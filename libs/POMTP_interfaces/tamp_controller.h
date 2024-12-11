@@ -27,6 +27,8 @@ struct TAMPlanningConfiguration
 
   bool watchMarkovianOptimizationResults{false};
   bool watchJointOptimizationResults{false};
+
+  bool saveVideo{false}; // by default from joint opt, effective only if watchJointOptimizationResults is true
 };
 
 class TAMPController

@@ -22,11 +22,12 @@ namespace mp
 class TrajectoryTreeVisualizer
 {
 public:           // for each terminal node, for each possible world, each frame
-  TrajectoryTreeVisualizer( const rai::Array< rai::Array< rai::Array< rai::KinematicWorld > > > & frames, const std::string & name, uint stepsPerSecs );
+  TrajectoryTreeVisualizer( const rai::Array< rai::Array< rai::Array< rai::KinematicWorld > > > & frames, const std::string & name, uint stepsPerSecs, bool saveVideo = false );
 
 private:
   std::vector< std::shared_ptr< KinPathViewer > > views_;
   uint stepsPerSecs_;
+  bool saveVideo_;
 };
 
 }
