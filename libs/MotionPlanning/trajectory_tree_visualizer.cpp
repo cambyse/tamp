@@ -17,8 +17,9 @@
 namespace mp
 {
 
-TrajectoryTreeVisualizer::TrajectoryTreeVisualizer( const rai::Array< rai::Array< rai::Array< rai::KinematicWorld > > > & frames, const std::string & name, uint stepsPerSecs )
+TrajectoryTreeVisualizer::TrajectoryTreeVisualizer( const rai::Array< rai::Array< rai::Array< rai::KinematicWorld > > > & frames, const std::string & name, uint stepsPerSecs, bool saveVideo )
   : stepsPerSecs_( stepsPerSecs )
+  , saveVideo_( saveVideo )
 {
   // get number of views
   uint n = 0;
@@ -58,14 +59,19 @@ TrajectoryTreeVisualizer::TrajectoryTreeVisualizer( const rai::Array< rai::Array
         }
 
         views_[ index ]->setConfigurations( configurations );
+        views_[ index ]->writeToFiles = saveVideo_;
+        views_[ index ]->text = STRING(index);
+        // for franka
+//        {
+//        uint w{1100};
+//        uint h{900};
+//        auto gl = views_[ index ]->gl;
+//        gl->resize(w,h);
+//        gl->camera.setWHRatio((double)w/h);
+//        gl->camera.focus(0.35, 0.0, 0.5);
+//        gl->camera.setFocalLength(12.0);
+//        }
 
-//            setHeightAngle(12.);
-//            setPosition(10., -15., 8.);
-//          //  setPosition(10., -4., 10.);
-//            focus(0, 0, 1.);
-//            upright();
-
-        // for baxter
 //        {
 //          auto & kin = views_[ index ];
 //          const double zf = 1.47;
@@ -75,19 +81,24 @@ TrajectoryTreeVisualizer::TrajectoryTreeVisualizer( const rai::Array< rai::Array
 //          kin->copy.gl().camera.upright();
 //        }
 
+        // for baxter
+//        {
+//          uint w{1100};
+//          uint h{900};
+//          auto gl = views_[ index ]->gl;
+
+//          const double zf = 1.47;
+//          const double s = 0.55;
+//          gl->resize(w,h);
+//          gl->camera.setWHRatio((double)w/h);
+//          gl->camera.setPosition(s * 10., s * 3., zf + s * ( 2.28 - zf ));
+//          gl->camera.focus(0, 0, zf);
+//          gl->camera.upright();
+//        }
         index++;
       }
     }
   }
-//  for( auto w = 0; w < policy->N(); ++w )
-//  {
-//    std::string windowName = name + std::string( "-world-" ) + std::to_string( w );
-//    views_[ w ] = std::make_shared< OrsPathViewer >( windowName.c_str(),  0.1, -0 );
-//    views_[ w ]->setConfigurations( policy->getTrajectory( w ) );
-//  }
-
-
-//  threadOpenModules( true );
 }
 
 }
