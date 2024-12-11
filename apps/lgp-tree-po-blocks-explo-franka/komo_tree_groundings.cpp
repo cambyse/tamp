@@ -10,6 +10,7 @@
 #include <Kin/TM_AboveBox.h>
 #include <Kin/TM_qLimits.h>
 
+#include <kin_equality_task.h>
 #include <observation_tasks.h>
 #include <axis_alignment.h>
 
@@ -17,9 +18,9 @@ using namespace rai;
 using W = mp::KomoWrapper;
 
 constexpr bool activateObjectives{true};
+constexpr double JointBounds_scale{1.0e2};
 constexpr double ZeroVelocity_scale{1.0e2};
 constexpr double TargetPosition_scale{1.0e2};
-constexpr double TM_AboveBox_scale{1.0e1};
 constexpr double SensorAimAtObjectCenter_scale{1.0e2};
 constexpr double SensorAlignsWithPivot_scale{1.0e2};
 constexpr double SensorDistanceToObject_scale{5.0e1};
@@ -139,17 +140,19 @@ void groundTreePickUp(const mp::Interval& it, const mp::TreeBuilder& tb, const s
 
 void groundTreeUnStack(const mp::Interval& it, const mp::TreeBuilder& tb, const std::vector<std::string>& facts, KOMO_ext* komo, int verbose)
 {
-//  mp::Interval all{{it.time.from, it.time.to - 0.01}, it.edge}; // needs to revise ors to update limits whoch are not conistent with scaling?
-//  if(activateObjectives)  W(komo).addObjective(all, tb, new LimitsConstraint(0.05), OT_ineq, NoArr, 1.0, 0);
+  mp::Interval all{{it.time.from, it.time.to - 0.01}, it.edge};
+  if(activateObjectives)  W(komo).addObjective(all, tb, new mp::AgentKinBounds(), OT_ineq, NoArr, JointBounds_scale, 0);
 
   const auto& eff = "franka_hand";
   const auto& object = facts[0].c_str();
   const bool flipped = (facts[2] == "TRUE");
 
-  // approach
-  mp::Interval before{{it.time.to - 0.3, it.time.to - 0.3}, it.edge};
-  const auto approach_position = flipped ? ARR( -0.1, 0.0, 0.0 ) : ARR( 0.0, 0.0, 0.1 );
-  if(activateObjectives) W(komo).addObjective( before, tb, new TargetPosition( eff, object, approach_position ), OT_sos, NoArr, TargetPosition_scale, 0 ); // coming from above
+  // never go under the table
+  if(activateObjectives) W(komo).addObjective( all, tb, new TargetZPosition( eff, "tableC", 0.05, -1.0 ), OT_ineq, NoArr, 1e1, 0 ); // never go under the table
+
+  // approach coming from above
+  mp::Interval before{{it.time.from + 0.35, it.time.to - 0.35}, it.edge};
+  if(activateObjectives) W(komo).addObjective( before, tb, new TargetZPosition( eff, "tableC", 0.125, -1.0 ), OT_ineq, NoArr, 1e1, 0 ); // come from above
 
   // switch
   mp::Interval st{{it.time.to, it.time.to}, it.edge};
@@ -161,7 +164,7 @@ void groundTreeUnStack(const mp::Interval& it, const mp::TreeBuilder& tb, const 
   mp::Interval end{{it.time.to, it.time.to}, it.edge};
   if(komo->k_order > 1)
   {
-    mp::Interval just_after{{it.time.to, it.time.to + 0.2}, it.edge};
+    mp::Interval just_after{{it.time.to, it.time.to + 0.15}, it.edge};
     if(activateObjectives) W(komo).addObjective( just_after, tb, new ZeroVelocity( object ), OT_eq, NoArr, ZeroVelocity_scale, 1 ); // force the object not to move when starting to pick (mainly to force it not to go under the table!) MAYBE completely wrong?! does it really affect velocities?
   }
 
@@ -173,19 +176,19 @@ void groundTreeUnStack(const mp::Interval& it, const mp::TreeBuilder& tb, const 
 
 void groundTreePutDown(const mp::Interval& it, const mp::TreeBuilder& tb, const std::vector<std::string>& facts, KOMO_ext* komo, int verbose)
 {
-//  mp::Interval all{{it.time.from, it.time.to - 0.01}, it.edge};
-//  if(activateObjectives)  W(komo).addObjective(all, tb, new LimitsConstraint(0.05), OT_ineq, NoArr, 1.0, 0); // needs to revise ors to update limits whoch are not conistent with scaling?
+  mp::Interval all{{it.time.from, it.time.to - 0.01}, it.edge}; // needs to revise ors to update limits which are not conistent with scaling?
+  if(activateObjectives)  W(komo).addObjective(all, tb, new mp::AgentKinBounds(), OT_ineq, NoArr, JointBounds_scale, 0);
 
+  const auto& eff = "franka_hand";
   const auto& object = facts[0].c_str();
   const auto& place = facts[1].c_str();
 
-  mp::Interval before{{it.time.to - 0.3, it.time.to - 0.3}, it.edge};
+  // never go under the table
+  if(activateObjectives) W(komo).addObjective( all, tb, new TargetZPosition( eff, place, 0.05, -1.0 ), OT_ineq, NoArr, 1e1, 0 ); // never go under the table
 
-  // approach
-  if(activateObjectives) W(komo).addObjective( before, tb, new TargetPosition( object, place, ARR( 0.0, 0.0, 0.1 ) ), OT_sos, NoArr, TargetPosition_scale, 0 ); // coming from above
-
-  mp::Interval end{{it.time.to, it.time.to}, it.edge};
-  if(activateObjectives) W(komo).addObjective(end, tb, new TM_AboveBox(komo->world, object, place), OT_ineq, NoArr, TM_AboveBox_scale, 0);
+  // approach coming from above
+  mp::Interval before{{it.time.from + 0.35, it.time.to - 0.35}, it.edge};
+  if(activateObjectives) W(komo).addObjective( before, tb, new TargetZPosition( eff, place, 0.1, -1.0 ), OT_ineq, NoArr, 1e1, 0 ); // come from above
 
   // switch
   mp::Interval st{{it.time.to, it.time.to}, it.edge};
@@ -196,8 +199,8 @@ void groundTreePutDown(const mp::Interval& it, const mp::TreeBuilder& tb, const 
 
   if(komo->k_order > 1)
   {
-    mp::Interval just_after{{it.time.to, it.time.to + 0.2}, it.edge};
-    if(activateObjectives) W(komo).addObjective( just_after, tb, new ZeroVelocity( object ), OT_eq, NoArr, ZeroVelocity_scale, 1 ); // force the object not to move when starting to pick (mainly to force it not to go under the table)
+    //mp::Interval just_after{{it.time.to - 0.1, it.time.to - 0.01}, it.edge};
+    //if(activateObjectives) W(komo).addObjective( just_after, tb, new ZeroVelocity( object ), OT_eq, NoArr, ZeroVelocity_scale, 1 ); // force the object not to move when starting to pick (mainly to force it not to go under the table)
   }
 
   if(verbose > 0)
@@ -214,11 +217,13 @@ void groundTreePutDownFlipped(const mp::Interval& it, const mp::TreeBuilder& tb,
 
 void groundTreeCheck(const mp::Interval& it, const mp::TreeBuilder& tb, const std::vector<std::string>& facts, KOMO_ext* komo, int verbose)
 {
-//  mp::Interval all{{it.time.from, it.time.to - 0.01}, it.edge};
-//  if(activateObjectives)  W(komo).addObjective(all, tb, new LimitsConstraint(0.05), OT_ineq, NoArr, 1.0, 0); // needs to revise ors to update limits whoch are not conistent with scaling?
+  mp::Interval all{{it.time.from, it.time.to - 0.01}, it.edge}; // needs to revise ors to update limits which are not conistent with scaling?
+  if(activateObjectives)  W(komo).addObjective(all, tb, new mp::AgentKinBounds(), OT_ineq, NoArr, JointBounds_scale, 0);
+  //
 
   const auto& eff = "franka_hand";
   const auto& object = facts[0].c_str();
+  const auto& side = facts[1].c_str();
 
   std::map<std::string, arr> sideToPivot{
     {"side_0", ARR( -0.05, 0.0, 0.0 )},
@@ -229,9 +234,12 @@ void groundTreeCheck(const mp::Interval& it, const mp::TreeBuilder& tb, const st
     {"side_5", ARR( 0.00, 0.00, -0.05 )}
   };
 
+  // never go under the table
+  if(activateObjectives) W(komo).addObjective( all, tb, new TargetZPosition( eff, object, 0.03, -1.0 ), OT_ineq, NoArr, 1e1, 0 );
+
   mp::Interval end{{it.time.to - 0.2, it.time.to}, it.edge};
   if(activateObjectives) W(komo, verbose).addObjective(end, tb, new SensorAimAtObjectCenter( eff, object, ARR( 0, 0, -1 ) ), OT_eq, NoArr, SensorAimAtObjectCenter_scale, 0 );
-  if(activateObjectives) W(komo, verbose).addObjective(end, tb, new SensorAlignsWithPivot( eff, object, sideToPivot[facts[1]], 45.0 * 3.1415 / 180.0 ), OT_ineq, NoArr, SensorAlignsWithPivot_scale, 0 );
+  if(activateObjectives) W(komo, verbose).addObjective(end, tb, new SensorAlignsWithPivot( eff, object, sideToPivot[side], 45.0 * 3.1415 / 180.0 ), OT_ineq, NoArr, SensorAlignsWithPivot_scale, 0 );
   //if(activateObjectives) W(komo).addObjective(end, tb, new SensorAlignsWithPivot( eff, object, sideToPivot[facts[1]], 45.0 * 3.1415 / 180.0 ), OT_sos, NoArr, 5e1, 0 );
   if(activateObjectives) W(komo, verbose).addObjective(end, tb, new SensorDistanceToObject( eff, object, 0.2, 0.0 ), OT_sos, NoArr, SensorDistanceToObject_scale, 0 );
 
