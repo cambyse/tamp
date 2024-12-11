@@ -18,8 +18,8 @@ shape baxterL (endeffL){ type=1 size=[0 0 0 0.005] color=[1 1 0] rel=<T t(0 0 0)
 shape id_2(block_2) { type=9 rel=<T t( 0.05 0  0.0)> size=[.02 .1 .1 .01] color=[0 0 1] }
 
 ## Joints
-joint (tableC block_2)          { from=<T t( 0 -0.075 .07 ) t(0 0 0)> to=<T > type=10 }
-joint (tableC block_1)          { from=<T t( 0 0.075 .07 ) t(0 0 0)> to=<T > type=10 } 
+joint (tableC block_2)          { from=<T t( 0 -0.175 .07 ) t(0 0 0)> to=<T > type=10 }
+joint (tableC block_1)          { from=<T t( 0 0.175 .07 ) t(0 0 0)> to=<T > type=10 } 
 joint (block_1 block_3)         { from=<T t( 0.0   0 .1  ) t(0 0 0)> to=<T > type=10 } 
 
 BELIEF_START_STATE { 

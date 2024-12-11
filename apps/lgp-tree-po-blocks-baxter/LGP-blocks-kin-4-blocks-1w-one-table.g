@@ -23,8 +23,8 @@ shape id_2(block_2) { type=9 rel=<T t( 0.05 0  0.0)> size=[.02 .1 .1 .01] color=
 shape id_4(block_4) { type=9 rel=<T t( 0.05 0  0.0)> size=[.02 .1 .1 .01] color=[1 0 1] }
 
 ## Joints
-joint (tableC block_2)          { from=<T t( 0 -0.075 .07 ) t(0 0 0)> to=<T > type=10 }
-joint (tableC block_1)          { from=<T t( 0 0.075 .07 ) t(0 0 0)> to=<T > type=10 } 
+joint (tableC block_2)          { from=<T t( 0 -0.175 .07 ) t(0 0 0)> to=<T > type=10 }
+joint (tableC block_1)          { from=<T t( 0 0.175 .07 ) t(0 0 0)> to=<T > type=10 } 
 joint (block_1 block_3)         { from=<T t( 0.0   0 .1  ) t(0 0 0)> to=<T > type=10 } 
 joint (block_2 block_4)         { from=<T t( 0.0   0 .1  ) t(0 0 0)> to=<T > type=10 } 
 

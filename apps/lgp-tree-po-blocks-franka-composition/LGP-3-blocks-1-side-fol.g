@@ -41,7 +41,7 @@ tableC
 START_STATE { (table tableR) (table tableC) 
 (block block_1) (id block_r) (block block_2) (id block_g) (block block_3) (id block_b) 
 (location tableR) (observation_location tableC)
-(UNEQUAL block_1 block_2) (UNEQUAL block_1 block_3) (UNEQUAL block_2 block_3)
+(UNEQUAL block_1 block_2) (UNEQUAL block_2 block_1) (UNEQUAL block_1 block_3) (UNEQUAL block_3 block_1) (UNEQUAL block_2 block_3) (UNEQUAL block_3 block_2)
 (clear block_3) (clear block_2) (clear tableR)
 (on_table block_1 tableR) (on_table block_2 tableR) (on block_3 block_1)
 (hand_empty) 
@@ -110,10 +110,11 @@ Rule {
   { (QUIT) }
 }
 
+
 ### Reward
 REWARD {
 }
 
 ### Tasks definitions
 Include = 'LGP-blocks-actions-observations.g'
-Include = 'LGP-blocks-last-block-deduction-3-blocks.g'
+#Include = 'LGP-blocks-last-block-deduction-3-blocks.g' (we need to still observe the side)

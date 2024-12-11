@@ -55,15 +55,12 @@ START_STATE {
 (table tableC) 
 (location tableC)
 (side side_0) (side side_1) (side side_2) (side side_3) (side side_4) (side side_5)
-(bottom_facing block_1 side_5)
-(bottom_facing block_2 side_5)
+(bottom_facing side_5)
 (block block_1) (id block_a) (block block_2) (id block_b) 
 (UNEQUAL block_1 block_2)
 (clear block_1) (clear block_2) (clear tableC)
 (on_table block_1 tableC) (on_table block_2 tableC)
 (hand_empty) 
-(flipped block_1 FALSE)
-(flipped block_2 FALSE)
 }
 
 EVENTUAL_FACTS{ 

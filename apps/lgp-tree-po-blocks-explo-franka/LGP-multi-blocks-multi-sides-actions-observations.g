@@ -1,45 +1,79 @@
 ### Actions
 # Check
 DecisionRule check {
-  X, Y
-  { (block X) (side Y) (identified X)!  (observed X Y)! (hand_empty)} # (bottom_facing Y)!
-  { (in_sight X Y) (observed X Y) komoCheck(X, Y)=1. }
+  X, Y, Z
+  { (block X) (side Y) (identified X)! (bottom_facing X Y)! (observed X Y)! (flipped X Z) (hand_empty) (clear X)} # remove bottom_facing ?
+  { (in_sight X Y) (observed X Y) (object_put_down X)! komoCheck(X, Y, Z)=1. }
 }
 
-# Pick-up
+# Pick-up, block already identified AND doesn't need flipping
 DecisionRule pick-up {
-  X, Y
-  { (block X) (location Y) (clear X) (on_table X Y) (hand_empty) }
-  { (on_table X Y)! (holding X) (hand_empty)! (clear X)! (clear Y) komoPickUp(X Y)=1. }
+  X, Y, Z, T
+  { (block X) (location Y) (side T) (on_table X Y) (flipped X Z) (colored X T) (identified X) (clear X) (needs_flipping X)! (hand_empty) }
+  { (on_table X Y)! (holding X) (hand_empty)! (object_put_down X)! (clear X)! komoPickUp(X Y Z T)=1. }
 }
 
-# Put-down
-DecisionRule put-down {
-  X, Y
-  { (block X) (location Y) (holding X) }
-  { (holding X)! (hand_empty) (clear X) (on_table X Y) komoPutDown(X Y)=1. }
+# Pick-up, block needs fleeping (might be identified or not)
+DecisionRule pick-up { # Pick up of a block needing flipping. can be dead-end if picked up without identification!
+  X, Y, Z, T
+  { (block X) (location Y) (side T) (on_table X Y) (flipped X Z) (colored X T) (clear X) (needs_flipping X) (hand_empty) }
+  { (on_table X Y)! (holding X) (hand_empty)! (object_put_down X)! (clear X)! komoPickUp(X Y Z T)=1. }
 }
 
-# Stack
-DecisionRule stack {
-  X, Y
-  { (block X) (block Y) (holding X) (clear Y) }
-  { (holding X)! (hand_empty) (clear X) (clear Y)! (on X Y) komoStack(X Y)=1. }
+# Put-down, no flipping
+DecisionRule put-down { 
+  X, Y, Z
+  { (block X) (location Y) (side Z) (holding X) (identified X) (needs_flipping X)! (colored X Z) }
+  { (holding X)! (hand_empty) (on_table X Y) (orientation_correct X) (object_put_down X) (clear X) komoPutDown(X Y Z)=1. }
 }
 
-# Unstack
-DecisionRule unstack {
-  X, Y
-  { (block X) (block Y) (clear X) (on X Y) (hand_empty) }
-  { (on X Y)! (holding X) (hand_empty)! (clear X)! (clear Y) komoUnStack(X Y)=1. }
+# Put-down-flipped
+DecisionRule put-down-flipped {
+  X, Y, Z
+  { (block X) (location Y) (side Z) (holding X) (flipped X FALSE) (needs_flipping X) (colored X Z)}
+  { (holding X)! (hand_empty) (bottom_facing X side_5)! (bottom_facing X side_2) (flipped X TRUE) (flipped X FALSE)! (needs_flipping X)! (orientation_correct X) (object_put_down X) (clear X) (on_table X Y) komoPutDown(X Y Z)=1. }
+}
+
+# Stack, no flipping
+DecisionRule stack { 
+  X, Y, Z
+  { (block X) (block Y) (side Z) (holding X) (clear Y) (identified X) (needs_flipping X)! (colored X Z) }
+  { (holding X)! (hand_empty) (clear X) (clear Y)! (orientation_correct X) (object_put_down X) (on X Y) komoStack(X Y Z)=1. }
+}
+
+# Stack-flipped
+DecisionRule stack-flipped {
+  X, Y, Z
+  { (block X) (block Y) (side Z) (holding X) (clear Y) (flipped X FALSE) (needs_flipping X) (colored X Z)}
+  { (holding X)! (hand_empty) (clear X) (clear Y)! (bottom_facing X side_5)! (bottom_facing X side_2) (flipped X TRUE) (flipped X FALSE)! (needs_flipping X)! (orientation_correct X) (object_put_down X) (clear X) (on X Y) komoStack(X Y Z)=1. }
+}
+
+# Unstack - assumes object already has the right orientation
+#DecisionRule unstack {
+#  X, Y
+#  { (block X) (block Y) (clear X) (on X Y) (hand_empty) }
+#  { (on X Y)! (holding X) (hand_empty)! (clear X)! (clear Y) komoUnStack(X Y)=1. }
+#}
+
+DecisionRule unstack { # Pick up of a block already identified and needed no flipping
+  X, Y, Z, T
+  { (block X) (block Y) (side T) (on X Y) (flipped X Z) (colored X T) (identified X) (clear X) (hand_empty) }
+  { (on X Y)! (holding X) (hand_empty)! (object_put_down X)! (clear X)! (clear Y) komoUnStack(X Y Z T)=1. }
 }
 
 ### Observation Model
-# Observation model (side identification)
+# Observation model (side identification) of an unknown side
 Rule {
   X, Y, Z
   { (block X) (side Y) (id Z) (NOT_OBSERVABLE colored X Y) (in_sight X Y) (NOT_OBSERVABLE is X Z)}
   { (in_sight X Y)! (colored X Y) (NOT_OBSERVABLE colored X Y)! (is X Z) (NOT_OBSERVABLE is X Z)! (identified X)}
+}
+
+# we deduced already which side is colored
+Rule {
+  X, Y, Z
+  { (block X) (side Y) (id Z) (colored X Y) (in_sight X Y) (NOT_OBSERVABLE is X Z)}
+  { (in_sight X Y)! (is X Z) (NOT_OBSERVABLE is X Z)! (identified X)}
 }
 
 # Observation model (block identification)
@@ -65,59 +99,68 @@ Rule {
 
 Rule { # remove in sight
   X, Y
-  { (block X) (side Y) (colored Y)! (in_sight X Y) }
+  { (block X) (side Y) (colored X Y)! (in_sight X Y) }
   { (in_sight X Y)!}
 }
 
 Rule { # remove in sight
   X, Y
-  { (block X) (side Y) (NOT_OBSERVABLE colored Y)! (in_sight X Y) }
+  { (block X) (side Y) (NOT_OBSERVABLE colored X Y)! (in_sight X Y) }
   { (in_sight X Y)!}
 }
 
 # Helpers
 Rule {
-  { (colored side_1) }
-  { (orientation_correct)}
+  X,
+  { (block X) (colored X side_1) }
+  { (orientation_correct X)}
 }
 
 Rule {
-  { (colored side_4) (flipped FALSE) }
-  { (needs_flipping)}
+  X,
+  { (block X) (colored X side_4) (flipped X FALSE) }
+  { (needs_flipping X)}
 }
 
 Rule {
-  { (colored side_5) (flipped FALSE) }
-  { (needs_flipping)}
+  X,
+  { (block X) (colored X side_5) (flipped X FALSE) }
+  { (needs_flipping X)}
 }
 
 # last side deduction
-#Rule {
-#  { (observed side_0) (observed side_1) (observed side_2) (observed side_3) (observed side_4) (identified block_1)! }
-#  { (NOT_OBSERVABLE colored side_5)! (colored side_5)}
-#}
+Rule {
+  X,
+  { (block X) (observed X side_0) (observed X side_1) (observed X side_2) (observed X side_3) (observed X side_4) (identified X)! }
+  { (NOT_OBSERVABLE colored X side_5)! (colored X side_5)}
+}
 
-#Rule {
-#  { (observed side_0) (observed side_1) (observed side_2) (observed side_3) (observed side_5) (identified block_1)! }
-#  { (NOT_OBSERVABLE colored side_4)! (colored side_4)}
-#}
+Rule {
+  X,
+  { (block X) (observed X side_0) (observed X side_1) (observed X side_2) (observed X side_3) (observed X side_5) (identified X)! }
+  { (NOT_OBSERVABLE X colored side_4)! (colored X side_4)}
+}
 
-#Rule {
-#  { (observed side_0) (observed side_1) (observed side_2) (observed side_4) (observed side_5) (identified block_1)! }
-#  { (NOT_OBSERVABLE colored side_3)! (colored side_3)}
-#}
+Rule {
+  X,
+  { (block X) (observed X side_0) (observed X side_1) (observed X side_2) (observed X side_4) (observed X side_5) (identified X)! }
+  { (NOT_OBSERVABLE X colored side_3)! (colored X side_3)}
+}
 
-#Rule {
-#  { (observed side_0) (observed side_1) (observed side_3) (observed side_4) (observed side_5) (identified block_1)! }
-#  { (NOT_OBSERVABLE colored side_2)! (colored side_2)}
-#}
+Rule {
+  X,
+  { (block X) (observed X side_0) (observed X side_1) (observed X side_3) (observed X side_4) (observed X side_5) (identified X)! }
+  { (NOT_OBSERVABLE colored X side_2)! (colored X side_2)}
+}
 
-#Rule {
-#  { (observed side_0) (observed side_2) (observed side_3) (observed side_4) (observed side_5) (identified block_1)! }
-#  { (NOT_OBSERVABLE colored side_1)! (colored side_1)}
-#}
+Rule {
+  X,
+  { (observed X side_0) (observed X side_2) (observed X side_3) (observed X side_4) (observed X side_5) (identified X)! }
+  { (NOT_OBSERVABLE colored X side_1)! (colored X side_1)}
+}
 
-#Rule {
-#  { (observed side_1) (observed side_2) (observed side_3) (observed side_4) (observed side_5) (identified block_1)! }
-#  { (NOT_OBSERVABLE colored side_0)! (colored side_0)}
-#}
+Rule {
+  X,
+  { (block X) (observed X side_1) (observed X side_2) (observed X side_3) (observed X side_4) (observed X side_5) (identified X)! }
+  { (NOT_OBSERVABLE colored X side_0)! (colored X side_0)}
+}

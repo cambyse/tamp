@@ -19,8 +19,8 @@ shape baxterR (endeffR){ type=1 size=[0 0 0 0.005] color=[1 1 0] rel=<T t(0.17 0
 shape baxterL (endeffL){ type=1 size=[0 0 0 0.005] color=[1 1 0] rel=<T t(0 0 0) d(0 0 0 1)> contact }
 
 ## Joints
-joint (tableC block_2)          { from=<T t( 0 -0.075 .07 ) t(0 0 0)> to=<T > type=10 }
-joint (tableC block_1)          { from=<T t( 0 0.075 .07 ) t(0 0 0)> to=<T > type=10 } 
+joint (tableC block_2)          { from=<T t( 0 -0.175 .07 ) t(0 0 0)> to=<T > type=10 }
+joint (tableC block_1)          { from=<T t( 0 0.175 .07 ) t(0 0 0)> to=<T > type=10 } 
 joint (block_1 block_3)         { from=<T t( 0.0   0 .1  ) t(0 0 0)> to=<T > type=10 } 
 joint (block_2 block_4)         { from=<T t( 0.0   0 .1  ) t(0 0 0)> to=<T > type=10 } 
 

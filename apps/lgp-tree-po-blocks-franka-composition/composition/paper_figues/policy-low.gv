@@ -1,0 +1,89 @@
+digraph g{
+bgcolor="transparent"{
+0 [style=filled, fillcolor=blue]
+}
+0->1 [ label="check(block_1,side_0,FALSE)
+r=-0.890485
+v=-18.0367
+" ];
+1->2 [ label="check(block_1,side_4,FALSE)
+r=-2.61131
+" ];
+2->3 [ label="check(block_1,side_1,FALSE)
+r=-0.5734
+" ];
+3->4 [ label="(is_final_action FALSE): true
+-
+check(block_1,side_2,FALSE)
+r=-0.697638
+" ];
+4->5 [ label="check(block_1,side_3,FALSE)
+r=-0.879038
+" ];
+5->6 [ label="(colored side_5): true
+(needs_flipping): true
+-
+pick-up(block_1,tableC,FALSE,side_5,FALSE)
+r=-0.374524
+" ];
+6->7 [ label="put-down-flipped(block_1,tableC,side_5,FALSE)
+r=-6.48997
+" ];
+7->8 [ label="check(block_1,side_5,TRUE)
+r=-3.05668
+" ];
+8->9 [ label="pick-up(block_1,tableC,TRUE,side_5,TRUE)
+r=-4.78179
+" ];
+9 [style=filled, fillcolor=green]
+5->10 [ label="(colored side_3): true
+(identified block_1): true
+-
+pick-up(block_1,tableC,FALSE,side_3,FALSE)
+r=-1.07462
+" ];
+10->11 [ label="put-down(block_1,tableC,side_3,TRUE)
+r=-32.1512
+" ];
+11 [style=filled, fillcolor=green]
+4->12 [ label="(colored side_2): true
+(identified block_1): true
+-
+pick-up(block_1,tableC,FALSE,side_2,FALSE)
+r=-3.01272
+" ];
+12->13 [ label="put-down(block_1,tableC,side_2,TRUE)
+r=-22.1964
+" ];
+13 [style=filled, fillcolor=green]
+3->14 [ label="(colored side_1): true
+(identified block_1): true
+(is_final_action TRUE): true
+(orientation_correct): true
+-
+pick-up(block_1,tableC,FALSE,side_1,TRUE)
+r=-0.762002
+" ];
+14 [style=filled, fillcolor=green]
+2->15 [ label="(colored side_4): true
+(identified block_1): true
+(needs_flipping): true
+-
+pick-up(block_1,tableC,FALSE,side_4,FALSE)
+r=-0.850652
+" ];
+15->16 [ label="put-down-flipped(block_1,tableC,side_4,TRUE)
+r=-4.30312
+" ];
+16 [style=filled, fillcolor=green]
+1->17 [ label="(colored side_0): true
+(identified block_1): true
+-
+pick-up(block_1,tableC,FALSE,side_0,FALSE)
+r=-1.18774
+" ];
+17->18 [ label="put-down(block_1,tableC,side_0,TRUE)
+r=-3.4349
+" ];
+18 [style=filled, fillcolor=green]
+}
