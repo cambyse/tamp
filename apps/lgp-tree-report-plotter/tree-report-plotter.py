@@ -33,7 +33,7 @@ assert file.readline() == "trajectoryTree\n"
 # trajectory tree
 trajectory_tree = []
 q_chunks = file.readline().rstrip().split(" ")
-while len(q_chunks) == qdim + 1:
+while len(q_chunks) >= qdim + 1:
   q = []
   for chunk in q_chunks[1:]:
     q.append(float(chunk))
@@ -105,7 +105,7 @@ while len(var_chunks) == 2 and var_chunks[0] == "branch":
 #print("vars: {}".format(vars))
 
 # plot costs branch by branch
-fig, axs = plt.subplots(2, len(vars), sharex='col', sharey='row',)
+fig, axs = plt.subplots(3, len(vars), sharex='col', sharey='row',)
 lined = dict()
 
 for i, var in enumerate(vars):
@@ -117,6 +117,8 @@ for i, var in enumerate(vars):
     name = objective.get("name")
     s_to_cost = []
 
+    # if "Transition" not in name:
+    #   continue
     if name in irrelevant_objectives:
       continue
 
@@ -140,7 +142,7 @@ for i, var in enumerate(vars):
       legline.set_picker(5)  # 5 pts tolerance
       lined[legline] = origline
 
-  # x
+  # q
   ax_1 = axs[1][i]
   all_lines_for_ax_1 = []
   for j in range(0, qdim):
@@ -157,6 +159,56 @@ for i, var in enumerate(vars):
   for legline, origline in zip(leg_1.get_lines(), all_lines_for_ax_1):
       legline.set_picker(5)  # 5 pts tolerance
       lined[legline] = origline
+
+  # for some addition plaots for journal paper only
+  # q dot dot
+  # def get_franka_scale(j):
+  #   if j == 0 or j == 1:
+  #     return 0.1
+  #
+  #   return 1.0
+  #
+  # def get_baxter_scale(j):
+  #   return 1.0
+  #
+  # ax_2 = axs[2][i]
+  # all_lines_for_ax_2 = []
+  # for j in range(0, 1): #qdim):
+  #   x = []
+  #   for local, (global_sm2, global_sm1, global_s) in enumerate(zip(var, var[1:], var[2:])):
+  #    qi_dot_dot = get_baxter_scale(j) * (2.0 * trajectory_tree[global_sm1][j] - trajectory_tree[global_sm2][j] - trajectory_tree[global_s][j])
+  #    x.append(qi_dot_dot)
+  #   line, = ax_2.plot(x, '-', label="q dot dot.{}".format(j))
+  #   all_lines_for_ax_2.append(line)
+  # leg_1 = ax_2.legend()
+  # #ax_2.set_ylim(-0.1, 0.1)
+
+  #we will set up a dict mapping legend line to orig line, and enable
+  #picking on the legend line
+  # for legline, origline in zip(leg_2.get_lines(), all_lines_for_ax_2):
+  #  legline.set_picker(5)  # 5 pts tolerance
+  #  lined[legline] = origline
+
+  #for paper only (give q dot dot on branch 3)
+  # if True:
+  #  for j in range(0, qdim):
+  #    scale = get_baxter_scale(j)
+  #
+  #    q_dot_dot = open("joint_{}_branch_{}_qddot.data".format(j, i), "w")
+  #    for local, (global_sm2, global_sm1, global_s) in enumerate(zip(var, var[1:], var[2:])):
+  #      qi_dot_dot =  scale * (2.0 * trajectory_tree[global_sm1][j] - trajectory_tree[global_sm2][j] - trajectory_tree[global_s][j]) * 40.0
+  #      q_dot_dot.write("{}, {}\n".format(local+2, qi_dot_dot)) # order 2
+  #
+  #    q_dot = open("joint_{}_branch_{}_qdot.data".format(j, i), "w")
+  #    for local, (global_sm1, global_s) in enumerate(zip(var, var[1:])):
+  #      qi_dot = scale * (
+  #                trajectory_tree[global_s][j] - trajectory_tree[global_sm1][j]) * 20.0
+  #      q_dot.write("{}, {}\n".format(local + 1, qi_dot))  # order 2
+  #
+  #    q = open("joint_{}_branch_{}_q.data".format(j, i), "w")
+  #    for local, global_s in enumerate(var):
+  #      qi = scale * trajectory_tree[global_s][j]
+  #      q.write("{}, {}\n".format(local, qi)) # order 2
 
 
 def onpick(event):
