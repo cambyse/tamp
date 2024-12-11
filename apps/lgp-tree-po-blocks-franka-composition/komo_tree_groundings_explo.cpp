@@ -222,8 +222,8 @@ void groundTreePutDown(const mp::Interval& it, const mp::TreeBuilder& tb, const 
 
     if(komo->k_order > 1)
     {
-      mp::Interval just_after{{it.time.to - 0.1, it.time.to}, it.edge};
-      if(activateObjectives) W(komo).addObjective( just_after, tb, new ZeroVelocity( object ), OT_eq, NoArr, ZeroVelocity_scale, 1 ); // force the object not to move when starting to pick (mainly to force it not to go under the table)
+      //mp::Interval just_after{{it.time.to - 0.1, it.time.to - 0.01}, it.edge};
+      //if(activateObjectives) W(komo).addObjective( just_after, tb, new ZeroVelocity( object ), OT_eq, NoArr, ZeroVelocity_scale, 1 ); // force the object not to move when starting to pick (mainly to force it not to go under the table)
     }
   }
 
