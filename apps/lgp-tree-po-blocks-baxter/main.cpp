@@ -429,13 +429,13 @@ void plan_Journal_2024()
 
   // set start configurations
   // D
-  {
-    tp.setR0( -0.1, 40.0 ); // -10.0, -0.1
-    tp.setNIterMinMax( 750000, 1000000 );
-    tp.setRollOutMaxSteps( 75 );
-    tp.setFol( "LGP-blocks-fol-one-table-no-precondition_easy.g" );
-    mp.setKin( "LGP-blocks-kin-one-table.g" );
-  }
+//  {
+//    tp.setR0( -0.1, 40.0 ); // -10.0, -0.1
+//    tp.setNIterMinMax( 750000, 1000000 );
+//    tp.setRollOutMaxSteps( 75 );
+//    tp.setFol( "LGP-blocks-fol-one-table-no-precondition_easy.g" );
+//    mp.setKin( "LGP-blocks-kin-one-table.g" );
+//  }
 
   // E
 //  {
@@ -447,19 +447,19 @@ void plan_Journal_2024()
 //  }
 
   // C
-//  {
-//    tp.setR0( -0.1, 15.0 ); // -10.0, -0.1
-//    tp.setNIterMinMax( 100000, 1000000 );
-//    tp.setRollOutMaxSteps( 50 );
+  {
+    tp.setR0( -10.0, 15.0 ); // -10.0, -0.1
+    tp.setNIterMinMax( 100000, 1000000 );
+    tp.setRollOutMaxSteps( 50 );
 
-//    tp.setFol( "LGP-blocks-fol-one-table.g" );
-//    mp.setKin( "LGP-blocks-kin-one-table.g" );
-//  }
+    tp.setFol( "LGP-blocks-fol-one-table.g" );
+    mp.setKin( "LGP-blocks-kin-one-table.g" );
+  }
 
   // checked, probably doesn't work with n steps = 5
   // B
 //  {
-//    tp.setR0( -0.1, 15.0 ); // -10.0, -0.1
+//    tp.setR0( -10.0, 15.0 ); // -10.0, -0.1
 //    tp.setNIterMinMax( 100000, 1000000 );
 //    tp.setRollOutMaxSteps( 50 );
 //    tp.setFol( "LGP-blocks-fol-2w-one-table.g" );
