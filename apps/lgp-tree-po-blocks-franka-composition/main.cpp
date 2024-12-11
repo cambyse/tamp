@@ -137,7 +137,7 @@ void plan(const double c0)
   ObjectManipulationTAMPController tamp(tp, mp);
   TAMPlanningConfiguration config;
   config.watchMarkovianOptimizationResults = false;
-  config.watchJointOptimizationResults = true;
+  config.watchJointOptimizationResults = false;
   tamp.plan(config);
 }
 
@@ -192,6 +192,16 @@ void plan_explo(const double c0)
 
 void play()
 {
+  // scenario A :
+  // - pick up block_2; blue; side is facing table (5),
+  //   - observe (long)
+  // - pick up block_3; red; side is 1
+  //   - observe (short)
+  // - build
+
+  // high index = 4
+  // low index = 5; low_index = 1
+
   XVariable XHigh;
   XHigh.load("composition/xvariable-high");
 
@@ -288,7 +298,7 @@ int main(int argc,char **argv)
   }
 
   const auto pb = value_or(args, "-pb", "blocks");
-  const double c0 = std::stof(value_or(args, "-c0", "5.0"));
+  const double c0 = std::stof(value_or(args, "-c0", "1.0"));
 
   if(pb == "blocks")
   {
