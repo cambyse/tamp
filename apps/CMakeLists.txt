@@ -4,14 +4,14 @@ add_subdirectory("lgp-collision-avoidance")
 #add_subdirectory("lgp-gjk")
 add_subdirectory("DomainPlayer")
 
-add_subdirectory("lgp-seq-boxes")
-add_subdirectory("lgp-tree-boxes")
+#add_subdirectory("lgp-seq-boxes")
+#add_subdirectory("lgp-tree-boxes")
 
-add_subdirectory("lgp-seq-blocks")
-add_subdirectory("lgp-tree-blocks")
+#add_subdirectory("lgp-seq-blocks")
+#add_subdirectory("lgp-tree-blocks")
 
-add_subdirectory("lgp-seq-po-blocks")
-add_subdirectory("lgp-tree-po-blocks")
+#add_subdirectory("lgp-seq-po-blocks")
+#add_subdirectory("lgp-tree-po-blocks")
 add_subdirectory("lgp-tree-po-blocks-baxter")
 add_subdirectory("lgp-tree-po-blocks-explo-baxter")
 
