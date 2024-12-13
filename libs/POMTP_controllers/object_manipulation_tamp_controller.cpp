@@ -136,7 +136,7 @@ Policy ObjectManipulationTAMPController::plan( const TAMPlanningConfiguration & 
 
     auto po     = MotionPlanningParameters( policy.id() );
     po.setParam( "type", "ADMMCompressed" ); //ADMMSparse, ADMMCompressed
-    po.setParam( "decompositionStrategy", "SubTreesAfterFirstBranching" ); // SubTreesAfterFirstBranching, BranchGen, Identity
+    po.setParam( "decompositionStrategy", "Identity" ); // SubTreesAfterFirstBranching, BranchGen, Identity
     po.setParam( "nJobs", "8" );
     mp_.solveAndInform( po, policy, config.watchJointOptimizationResults, config.saveVideo );   // optimize and displays joint optimization -> output in optimizationReportAdmmCompressed.re
 
