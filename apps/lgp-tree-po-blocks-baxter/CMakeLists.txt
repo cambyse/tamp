@@ -43,3 +43,14 @@ target_link_libraries(
  MotionPlanning
  GeometricUtilityTasks
  )
+
+# copy the robot defintion
+file(COPY ${CMAKE_CURRENT_LIST_DIR}/data/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/data)
+
+# Find all files matching the pattern
+file(GLOB tamp_pb_files "${CMAKE_CURRENT_LIST_DIR}/LGP*.g")
+
+# Copy the files to the binary directory
+foreach(file ${tamp_pb_files})
+    file(COPY ${file} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+endforeach()
