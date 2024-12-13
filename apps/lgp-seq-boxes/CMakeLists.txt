@@ -33,4 +33,5 @@ target_link_libraries(
  POMTP_interfaces
  ObservationTasks
  CollisionAvoidance
+ GeometricUtilityTasks
  )
