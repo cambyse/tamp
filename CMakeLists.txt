@@ -6,8 +6,8 @@ project(${project_name})
 
 add_definitions(-std=c++14)
 
-set(MLR_LIBRARIES_DIR "~/Dev/mlr/rai/lib")
-set(MLR_INCLUDE_DIR "~/Dev/mlr/rai/rai")
+#set(MLR_LIBRARIES_DIR CACHE STRING "~/Dev/mlr/rai/lib") #only defualt value if not overriden here..
+#set(MLR_INCLUDE_DIR CACHE STRING "~/Dev/mlr/rai/rai")
 
 #set(DLIB_LIBRARIES_DIR "/usr/local/lib")
 #set(DLIB_INCLUDE_DIR "/usr/local/inlcude/")
