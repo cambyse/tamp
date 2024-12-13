@@ -12,7 +12,6 @@
 #include <belief_state.h>
 #include <komo_planner_utils.h>
 #include <komo_sparse_planner.h>
-#include <komo_sub_problems_finder.h>
 #include <komo_planner_utils.h>
 #include <Core/util.h>
 
@@ -228,11 +227,11 @@ void KOMOPlanner::solveAndInform( const MotionPlanningParameters & po, Policy & 
     planner.setDecompositionStrategy(po.getParam("decompositionStrategy"), po.getParam("nJobs"));
     planner.optimize(policy, startKinematics_, watch, saveVideo);
   }
-  else if( po.getParam( "type" ) == "ADMMDecompose" )
-  {
-    KOMOSubProblemsFinder analyser(config_, komoFactory_);
-    analyser.analyse(policy, startKinematics_);
-  }
+//  else if( po.getParam( "type" ) == "ADMMDecompose" )
+//  {
+//    KOMOSubProblemsFinder analyser(config_, komoFactory_);
+//    analyser.analyse(policy, startKinematics_);
+//  }
   else if( po.getParam( "type" ) == "EvaluateMarkovianCosts" )
   {
     EvaluationPlanner evaluation(config_, komoFactory_, getMarkovianPathTreeVariableQDim(policy), "results/optimizationReportMarkovianPathTree.re");
