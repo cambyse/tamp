@@ -14,7 +14,7 @@ add_definitions(-std=c++14)
 
 enable_testing()
 
-add_subdirectory("libs/HessianDecomposition")
+#add_subdirectory("libs/HessianDecomposition")
 add_subdirectory("libs/GeometricUtilityTasks")
 add_subdirectory("libs/ObservationTasks")
 add_subdirectory("libs/CollisionAvoidance")
