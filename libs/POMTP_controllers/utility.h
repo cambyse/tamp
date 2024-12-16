@@ -33,3 +33,31 @@ std::string value_or(const std::map<std::string, std::string>& m, const std::str
     auto it = m.find(key);
     return it != m.end() ? it->second : default_value;
 }
+
+
+void generatePngImage( const std::string & name )
+{
+  std::string nameCopy( name );
+  const std::string ext( ".gv" );
+  std::string newName = nameCopy.replace( nameCopy.find( ext ), ext.length(), ".png" );
+
+  std::stringstream ss;
+  ss << "dot"   << " ";
+  ss << "-Tpng" << " ";
+  ss << "-o"    << " ";
+  ss << newName << " ";
+  ss << name;
+
+  system( ss.str().c_str() );
+}
+
+void savePolicyToFile( const Policy & policy, const std::string & suffix = "" )
+{
+  std::stringstream namess, skenamess;
+
+  namess << "policy-" << policy.id() << suffix;
+  policy.save( namess.str() );
+
+  namess << ".gv";
+  policy.saveToGraphFile( namess.str() );
+}
