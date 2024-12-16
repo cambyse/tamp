@@ -20,6 +20,7 @@
 #include <approx_shape_to_sphere.h>
 #include <observation_tasks.h>
 #include <object_manipulation_tamp_controller.h>
+#include <utility.h>
 
 #include "komo_tree_groundings.h"
 
@@ -409,6 +410,86 @@ void plan_3_methods()
   }
 }
 
+void ground_and_run(matp::MCTSPlanner& tp, mp::KOMOPlanner& mp, bool watchJointOptimizationResults)
+{
+  // register symbols
+  mp.registerInit( groundTreeInit );
+  mp.registerTask( "pick-up"      , groundTreePickUp );
+  mp.registerTask( "put-down"     , groundTreePutDown );
+  mp.registerTask( "check"        , groundTreeCheck );
+  mp.registerTask( "stack"        , groundTreeStack );
+  mp.registerTask( "unstack"      , groundTreeUnStack );
+
+  // build and run tamp controller
+  ObjectManipulationTAMPController tamp(tp, mp);
+  TAMPlanningConfiguration config;
+  config.watchMarkovianOptimizationResults = false;
+  config.watchJointOptimizationResults = watchJointOptimizationResults;
+  config.saveVideo = false;
+  tamp.plan(config);
+}
+
+void plan_A(const double c0, bool watchJointOptimizationResults)
+{
+  matp::MCTSPlanner tp;
+  mp::KOMOPlanner mp;
+
+  tp.setR0( -c0, 15.0 ); // -10.0, -0.1
+  tp.setNIterMinMax( 50000, 1000000 );
+  tp.setRollOutMaxSteps( 50 );
+  tp.setFol( "LGP-blocks-fol-1w-one-table.g" );
+  mp.setKin( "LGP-blocks-kin-1w-one-table.g" );
+
+  mp.setNSteps( 20 );
+  mp.addCostIrrelevantTask( "FixSwichedObjects" );
+  mp.addCostIrrelevantTask( "LimitsConstraint" );
+
+  ground_and_run(tp, mp, watchJointOptimizationResults);
+}
+
+void plan_B(const double c0, bool watchJointOptimizationResults)
+{
+  matp::MCTSPlanner tp;
+  mp::KOMOPlanner mp;
+
+  tp.setR0( -c0, 15.0 ); // -10.0, -0.1
+  tp.setNIterMinMax( 100000, 1000000 );
+  tp.setRollOutMaxSteps( 50 );
+  tp.setFol( "LGP-blocks-fol-2w-one-table.g" );
+  mp.setKin( "LGP-blocks-kin-2w-one-table.g" );
+
+  ground_and_run(tp, mp, watchJointOptimizationResults);
+}
+
+void plan_C(const double c0, bool watchJointOptimizationResults)
+{
+  matp::MCTSPlanner tp;
+  mp::KOMOPlanner mp;
+
+  tp.setR0( -c0, 15.0 ); // -10.0, -0.1
+  tp.setNIterMinMax( 100000, 1000000 );
+  tp.setRollOutMaxSteps( 50 );
+
+  tp.setFol( "LGP-blocks-fol-one-table.g" );
+  mp.setKin( "LGP-blocks-kin-one-table.g" );
+
+  ground_and_run(tp, mp, watchJointOptimizationResults);
+}
+
+void plan_D(const double c0, bool watchJointOptimizationResults)
+{
+  matp::MCTSPlanner tp;
+  mp::KOMOPlanner mp;
+
+  tp.setR0( -c0, 40.0 ); // -10.0, -0.1
+  tp.setNIterMinMax( 750000, 1000000 );
+  tp.setRollOutMaxSteps( 75 );
+  tp.setFol( "LGP-blocks-fol-one-table-no-precondition_easy.g" );
+  mp.setKin( "LGP-blocks-kin-one-table.g" );
+
+  ground_and_run(tp, mp, watchJointOptimizationResults);
+}
+
 void plan_Journal_2024()
 {
   //srand(1);
@@ -522,17 +603,40 @@ int main(int argc,char **argv)
 
   rnd.clockSeed();
 
+  auto args = parseArguments(argc, argv);
+
+  const std::string pb = value_or(args, "-pb", "B");
+  const double c0 = std::stof(value_or(args, "-c0", "5.0"));
+  const bool watch = std::stoi(value_or(args, "-display", "1")) != 0;
+
   //komo_tree_dev();
 
   //plan_graph_search();
 
   //plan_3_methods();
 
+  if(pb == "A")
+  {
+    plan_A(c0, watch);
+  }
+  if(pb == "B")
+  {
+    plan_B(c0, watch);
+  }
+  if(pb == "C")
+  {
+    plan_C(c0, watch);
+  }
+  if(pb == "D")
+  {
+    plan_D(c0, watch);
+  }
+
+  //plan_Journal_2024();
+
   /// methods for creating materail for the thesis
   //display_robot();
   //decision_tree();
-
-  plan_Journal_2024();
 
   return 0;
 }

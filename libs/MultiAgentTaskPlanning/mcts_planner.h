@@ -64,7 +64,7 @@ private:
   // MCTS parameters
   std::size_t nIterMin_{0};
   std::size_t nIterMax_{50};
-  std::size_t nRollOutsPerSimulation_{5};
+  std::size_t nRollOutsPerSimulation_{1};
   std::size_t rollOutMaxSteps_{30};
   double explorationTermC_{1.0};
 
