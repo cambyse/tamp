@@ -24,7 +24,7 @@
 
 //===========================================================================
 
-void plan(const double c0)
+void plan(const double c0, const bool watch)
 {
   // debug mp
 //  {
@@ -106,11 +106,11 @@ void plan(const double c0)
   ObjectManipulationTAMPController tamp(tp, mp);
   TAMPlanningConfiguration config;
   config.watchMarkovianOptimizationResults = false;
-  config.watchJointOptimizationResults = false;
+  config.watchJointOptimizationResults = watch;
   tamp.plan(config);
 }
 
-void plan_explo(const double c0)
+void plan_explo(const double c0, const bool watch)
 {
   //srand(1);
 
@@ -151,7 +151,7 @@ void plan_explo(const double c0)
   ObjectManipulationTAMPController tamp(tp, mp);
   TAMPlanningConfiguration config;
   config.watchMarkovianOptimizationResults = false;
-  config.watchJointOptimizationResults = false;
+  config.watchJointOptimizationResults = watch;
 //  std::ofstream params("results/params.data");
 //  params << "c0: " << -1.0 << std::endl;
 //  params.close();
@@ -261,28 +261,24 @@ int main(int argc,char **argv)
 
   rnd.clockSeed();
 
-  for (const auto& [key, value] : args)
-  {
-     std::cout << key << ": " << value << std::endl;
-  }
-
-  const auto pb = value_or(args, "-pb", "blocks");
+  const auto pb = value_or(args, "-pb", "A");
   const double c0 = std::stof(value_or(args, "-c0", "1.0"));
+  const bool watch = std::stoi(value_or(args, "-display", "1")) != 0;
 
-  if(pb == "blocks")
+  if(pb == "C")
   {
-    plan(c0);
+    plan(c0, watch);
   }
 
-  if(pb == "explo")
+  if(pb == "A")
   {
-    plan_explo(c0);
+    plan_explo(c0, watch);
   }
 
-  if(pb == "both")
+  if(pb == "CA")
   {
-    plan_explo(c0);
-    plan(c0);
+    plan(c0, watch);
+    plan_explo(c0, watch);
   }
 
   if(pb == "play")
